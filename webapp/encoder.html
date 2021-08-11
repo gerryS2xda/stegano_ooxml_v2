@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Codificatore</title>
+    <style>
+.button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.button_download {
+  background-color: red;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+.aParent div {
+    float: left;
+    clear: none;
+}
+body {
+  height: 100vh;
+	width: 100%;
+  background: #0f2027; /* fallback for old browsers */
+  background: linear-gradient(to right,#2c5364, #203a43, #0f2027);
+  display: flex;
+  justify-content: left;
+  align-items: left;
+  height: 100vh;
+  color: #fff;
+}
+.circle{
+    counter-reset: list-counter;
+    list-style: none;
+    float:left;
+}
+.circle li{
+    margin: 1.5em 0;
+}
+.circle li:before{
+    content: counter(list-counter);
+    counter-increment: list-counter;
+    width: 1em;
+    height: 1em;
+    padding: .5em;
+    margin-right: 1em;
+    border-radius: 50%;
+    border: .25em solid #ccc;
+    background: #7c795d;
+    color: #fff;
+    font-family: arial;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+
+}
+
+.form__label {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.2rem;
+  margin-left: 2rem;
+  margin-top: 0.7rem;
+  display: block;
+  transition: all 0.3s;
+  transform: translateY(0rem);
+}
+</style>
+
+</head>
+<body onload="checkIfSuccess()">
+
+<ul class="circle">
+    <div class="box_output_stego_file" hidden>
+        <h1 style="color:red">Risultato</h1>
+        <form method="POST" action="/stego/stego.docx"><button class="button_download">SCARICA FILE STEGANOGRAFATO</button></form>
+        <a href="/decoder" class="button_download">Decifra testo segreto</a>
+    </div>
+
+<h1 style="color: #7c795d; font-family: 'Trocchi', serif; font-size: 45px; font-weight: normal; line-height: 48px; margin: 0;">Seleziona il file cover</h1>
+
+    <div class="aParent">
+            <div class="box_input">
+
+                <li class="form__label" class="form__label">Input 1</li>
+                <form method="POST" action="/input/1/input1.docx"><button class="button">Scarica file</button></form>
+                <input type="button" id="input_1" class="button" value="Inietta testo segreto" onclick="inject_text(this)">
+            </div>
+        <div class="box_input">
+                    <li class="form__label">Input 2</li>
+                    <form method="POST" action="/input/2/input2.docx"><button class="button">Scarica file</button></form>
+                    <input type="button" id="input_2" class="button" value="Inietta testo segreto" onclick="inject_text(this)">
+        </div>
+
+    <div class="box_input">
+                <li class="form__label">Input 3</li>
+                <form method="POST" action="/input/3/input3.docx"><button class="button">Scarica file</button></form>
+                <input type="button" id="input_3" class="button" value="Inietta testo segreto" onclick="inject_text(this)">
+    </div>
+    </div>
+    <div class="aParent">
+        <div class="box_input">
+                <li class="form__label">Input 4</li>
+                <form method="POST" action="/input/4/input4.docx"><button class="button">Scarica file</button></form>
+                <input type="button" id="input_4" class="button" value="Inietta testo segreto" onclick="inject_text(this)">
+        </div>
+        <div class="box_input">
+                <li class="form__label">Input 5</li>
+                <form method="POST" action="/input/5/input5.docx"><button class="button">Scarica file</button></form>
+                <input type="button" id="input_5" class="button" value="Inietta testo segreto" onclick="inject_text(this)">
+        </div>
+        <div class="box_input">
+                <li class="form__label">Input 6</li>
+                <form method="POST" action="/input/6/input6.docx"><button class="button">Scarica file</button></form>
+                <input type="button" id="input_6" id="input_6" class="button" value="Inietta testo segreto" onclick="inject_text(this)">
+        </div>
+    </div>
+    <div class="aParent">
+        <div class="box_input">
+                <li class="form__label">Input 7</li>
+                <form method="POST"  action="/input/7/input7.docx"><button class="button">Scarica file</button></form>
+                <input type="button" id="input_7" class="button" value="Inietta testo segreto" onclick="inject_text(this)">
+            </div>
+                <div class="box_input">
+                <li class="form__label">Input 8</li>
+                <form method="POST" action="/input/8/input8.docx"><button class="button">Scarica file</button></form>
+                <input type="button" id="input_8" class="button" value="Inietta testo segreto" onclick="inject_text(this)">
+            </div>
+            <div class="box_input">
+                <li class="form__label">Input 9</li>
+                <form method="POST"  action="/input/9/input9.docx"><button class="button">Scarica file</button></form>
+                <input type="button" id="input_9" class="button" value="Inietta testo segreto" onclick="inject_text(this)">
+            </div>
+    </div>
+    <div class="aParent">
+        <div class="box_input">
+                <li class="form__label">Input 10</li>
+                <form method="POST" action="/input/10/input10.docx"><button class="button">Scarica file</button></form>
+                <input type="button" id="input_10" class="button" value="Inietta testo segreto" onclick="inject_text(this)">
+        </div>
+    </div>
+
+
+</ul>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+
+    function checkIfSuccess(){
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const success = urlParams.get('success');
+        if(success=="true"){
+            alert("Iniezione del testo completato con successo");
+            $(".box_output_stego_file").show();
+
+        }
+    }
+    function inject_text(elem){
+        var message = prompt("Inserisci il messaggio da iniettare", "");
+        var pass = prompt("Inserisci la password per proteggere il messaggio", "");
+        window.location.href = "/encoding?input=" + elem.id.split("_")[1] + "&message=" + message + "&pass=" + pass;
+    }
+
+</script>
+</body>
+
+</html>

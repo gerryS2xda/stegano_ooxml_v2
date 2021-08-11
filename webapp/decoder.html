@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Codificatore</title>
+    <style>
+.button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.button_download {
+  background-color: red;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+body {
+  height: 100vh;
+	width: 100%;
+  background: #0f2027; /* fallback for old browsers */
+  background: linear-gradient(to right,#2c5364, #203a43, #0f2027);
+  display: flex;
+  justify-content: left;
+  align-items: left;
+  height: 100vh;
+  color: #fff;
+}
+
+
+.form__label {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.2rem;
+  margin-left: 2rem;
+  margin-top: 0.7rem;
+  display: block;
+  transition: all 0.3s;
+  transform: translateY(0rem);
+}
+
+.form__input {
+  font-family: 'Roboto', sans-serif;
+  color: #333;
+  font-size: 1.2rem;
+	margin: 0 auto;
+  padding: 1.5rem 2rem;
+  border-radius: 0.2rem;
+  background-color: rgb(255, 255, 255);
+  border: none;
+  width: 90%;
+  display: block;
+  border-bottom: 0.3rem solid transparent;
+  transition: all 0.3s;
+}
+
+.form__input:placeholder-shown + .form__label {
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transform: translateY(-4rem);
+  transform: translateY(-4rem);
+}
+
+</style>
+
+</head>
+<body onload="checkIfSuccess()">
+
+<ul>
+    <div class="box_testo_segreto" hidden>
+        <h1 style="color:#4CAF50">Risultato</h1>
+        <p id="secret_text"></p>
+    </div>
+
+<h1 style="color: #4CAF50; font-family: 'Trocchi', serif; font-size: 45px; font-weight: normal; line-height: 48px; margin: 0;">Carica file stego</h1>
+
+    <form enctype="multipart/form-data" method="POST" action="/decoding">
+
+            <div class="box_input" style="margin-bottom:20px">
+                <p class="form__label">Scegli file</p>
+                <input class="form__input" type="file" name="file_stego">
+            </div>
+            <div class="box_input" style="margin-bottom:20px">
+                <p class="form__label">Password per la decifratura</p>
+                <input type="text" class="form__input" name="password" placeholder="inserisci password">
+            </div>
+            <div class="box_input">
+                <input type="submit" id="input_8" class="button" value="Estrai testo segreto">
+            </div>
+    </form>
+
+</ul>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+
+    function checkIfSuccess(){
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const success = urlParams.get('testo_segreto');
+        if(success){
+            alert("File decodificato correttamente!");
+            $(".box_testo_segreto").show();
+            $("#secret_text").text(success);
+
+        }
+    }
+
+</script>
+</body>
+
+</html>
