@@ -115,7 +115,7 @@ def createFileStego(tree,name_file):
             if dirname == "./stego/file_extracted":
                 path = filename
             else:
-                path = dirname.split("./stego/file_extracted\\")[1] + "/" + filename
+                path = dirname.split("./stego/file_extracted")[1] + "/" + filename
             zf.write(os.path.join(dirname, filename), path)
     zf.close()
     #Check if file exists before to rename zip file

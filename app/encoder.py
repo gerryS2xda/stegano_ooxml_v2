@@ -119,16 +119,22 @@ def createFileStego(tree,name_file):
     copy_tree("input/" + name_file + "/file_extracted", "stego/file_extracted")
     shutil.copy("stego/document.xml", "stego/file_extracted/word")
     zf = zipfile.ZipFile("stego/stego.zip", "w",zipfile.ZIP_DEFLATED)
-    for dirname, subdirs, files in os.walk("stego/file_extracted"):
+    for dirname, subdirs, files in os.walk("./stego/file_extracted"):
         for filename in files:
             path=""
             if dirname == "./stego/file_extracted":
                 path = filename
             else:
-                path = dirname.split("./stego/file_extracted/")[1] + "/" + filename
+                path = dirname.split("./stego/file_extracted")[1] + "/" + filename
             zf.write(os.path.join(dirname, filename),path)
     zf.close()
-    os.rename('./stego/stego.zip', 'stego/stego.docx')
+    # Check if file exists before to rename zip file
+    if (os.path.exists('./stego/stego.docx')):
+        os.remove('./stego/stego.docx')
+    os.rename('./stego/stego.zip', './stego/stego.docx')
+    os.remove('./stego/document.xml')
+    shutil.rmtree('./stego/file_extracted')
+    shutil.rmtree('./stego/word')
     return "stego/stego.zip"
 
 def encoding(message,password,path_file_extracted):
