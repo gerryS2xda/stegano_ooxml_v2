@@ -132,9 +132,8 @@ def createFileStego(tree,name_file):
     if (os.path.exists('./stego/stego.docx')):
         os.remove('./stego/stego.docx')
     os.rename('./stego/stego.zip', './stego/stego.docx')
-    os.remove('./stego/document.xml')
+    #os.remove('./stego/document.xml')
     shutil.rmtree('./stego/file_extracted')
-    shutil.rmtree('./stego/word')
     return "stego/stego.zip"
 
 def encoding(message,password,path_file_extracted):
@@ -246,7 +245,7 @@ if __name__ == '__main__':
     # inserisci passphrase per la generazione della chiave simmetrica
     PASSWORD = input("Inserisci password per la cifratura del testo: ")
 
-    encoding(MESSAGE,PASSWORD,PATH_FILE_EXTRACTED)
+    encoding(MESSAGE, PASSWORD, PATH_FILE_EXTRACTED)
     exit(0)
 
 
