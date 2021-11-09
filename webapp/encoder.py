@@ -124,6 +124,7 @@ def createFileStego(tree,name_file):
     os.rename('./stego/stego.zip', './stego/stego.docx')
     os.remove('./stego/document.xml')
     shutil.rmtree('./stego/file_extracted')
+    shutil.rmtree('./stego/word')
     return "stego/stego.docx"
 
 def random_num_except(except_num):
