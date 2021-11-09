@@ -1,3 +1,7 @@
+#Project ignore file and directory
+/app/stego/
+/webapp/stego/
+
 # Default ignored files
 /shelf/
 /workspace.xml
