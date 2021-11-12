@@ -8,6 +8,7 @@ import copy
 import random
 from app import utils
 
+#Constant for XML WordProcessingML element
 PREFIX_WORD_PROC = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 PARAGRAPH_TAG = PREFIX_WORD_PROC + "p"
 RUN_ELEMENT_TAG = PREFIX_WORD_PROC + "r"
@@ -109,8 +110,8 @@ def check_if_available_space(index,paragraph,information_to_encode_bits,offset_r
     return True
 
 
-def printStat(total_counter_words,total_counter_inclusion, information_to_encode_bits):
-    print("CAPACITA' TOTALE :" + total_counter_words.__str__())
+def printStat(total_counter_characters, total_counter_inclusion, information_to_encode_bits):
+    print("CAPACITA' TOTALE :" + total_counter_characters.__str__())
     print("CAPACITA' INCLUSIONE:" + total_counter_inclusion.__str__())
     print("MINIMO DI BITS DA INIETTARE: " + len(information_to_encode_bits).__str__())
 
@@ -136,17 +137,21 @@ def createFileStego(tree,name_file):
     shutil.rmtree('./stego/file_extracted')
     return "stego/stego.zip"
 
-def encoding(message,password,path_file_extracted):
+def encoding(message, password, path_file_extracted):
     # step 1 -> Leggi il codice dal file "document.xml", relativo al documento D
     tree = etree.parse("input/" + path_file_extracted + '/file_extracted/word/document.xml')
     root = tree.getroot()
+
     # step 2 -> Cifra il testo segreto H mediante l’algoritmo AES-CBC, usando la chiave simmetrica
-    ENCRYPTED = utils.encrypt(PASSWORD, MESSAGE)
-    print(ENCRYPTED)
+    encrypted = utils.encrypt(message, password)
+    print(encrypted)
+
     # step 3 -> aggiungi alla fine del testo cifrato il carattere di divisione "%"
-    INFORMATION_TO_ENCODE_BITS = utils.text_to_binary(ENCRYPTED.decode('utf-8')) + utils.text_to_binary(
+    information_to_encode_bits = utils.text_to_binary(encrypted.decode('utf-8')) + utils.text_to_binary(
         utils.MAGIC_CHAR_SPLIT)
-    total_counter_words = 0
+
+    # Inizializzazione di un contatore di caratteri e di inclusione
+    total_counter_characters = 0
     total_counter_inclusion = 0
     print("INIEZIONE IN CORSO .....")
     paragraphs = root.findall("./" + BODY_TAG + "/" + PARAGRAPH_TAG)
@@ -158,7 +163,7 @@ def encoding(message,password,path_file_extracted):
 
         run_elements = []
         for node in paragraph.findall("./" + RUN_ELEMENT_TAG):
-            if node.find("./" +  TEXT_TAG) != None:
+            if node.find("./" + TEXT_TAG) != None:
                 run_elements.append(node)
         i_run_elements = 1
         offset_run_elem = 1
@@ -175,7 +180,7 @@ def encoding(message,password,path_file_extracted):
             szcs_val_prec = random_num_except(szcs_val_prec)
             # step8 -> Inizializza il contatore N=1 per accumulare il numero di caratteri da dividere. Successivamente, conta il numero di caratteri in T, e memorizzali nella variabile C.
             N = 1
-            total_counter_words += len(run_elements[i_run_elements - 1].find("./" + TEXT_TAG).text)
+            total_counter_characters += len(run_elements[i_run_elements - 1].find("./" + TEXT_TAG).text)
 
             tag_element = run_elements[i_run_elements - 1].find("./" + TEXT_TAG)
             # se non contiene il tag rpr lo aggiungo al run element corrente
@@ -187,18 +192,18 @@ def encoding(message,password,path_file_extracted):
             # se non contiene il tag szCS lo aggiungo al run element corrente
             elif run_elements[i_run_elements - 1].find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG) == None:
                     run_elements[i_run_elements - 1].find("./" + RUN_ELEM_PROPERTY_TAG).append(etree.Element(SZCS_TAG))
-                    run_elements[i_run_elements - 1].find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG).set(PREFIX_WORD_PROC + "val",szcs_val_prec.__str__())
+                    run_elements[i_run_elements - 1].find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG).set(PREFIX_WORD_PROC + "val", szcs_val_prec.__str__())
 
             # step 8 -> Inizializza il contatore N=1 per accumulare il numero di caratteri da dividere. Successivamente, conta il numero di caratteri in T, e memorizzali nella variabile C.
             count = len(tag_element.text)
             #step 12 -> Ritorna allo step 9 fino a quando C >= 1;
             while count >=1:
                 #check if enough space to inject information coded remain
-                if(check_if_available_space(i,paragraph,INFORMATION_TO_ENCODE_BITS,offset_run_elem,count) == False):
+                if(check_if_available_space(i, paragraph, information_to_encode_bits, offset_run_elem,count) == False):
                     break
                 #step 9,10,11
                 # case a
-                if(INFORMATION_TO_ENCODE_BITS[i % len(INFORMATION_TO_ENCODE_BITS)]) == "0":
+                if(information_to_encode_bits[i % len(information_to_encode_bits)]) == "0":
                     N += 1
                 #case b
                 elif paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]" + "/" + TEXT_TAG) != None:
@@ -232,20 +237,22 @@ def encoding(message,password,path_file_extracted):
             i_run_elements += 1
             offset_run_elem += 1
     total_counter_inclusion = i
-    printStat(total_counter_words,total_counter_inclusion,INFORMATION_TO_ENCODE_BITS)
-    createFileStego(tree,path_file_extracted)
-    print("il file .docx steganografato è stato salvato nella directory stego")
+    printStat(total_counter_characters, total_counter_inclusion, information_to_encode_bits)
+    createFileStego(tree, path_file_extracted)
+    print("Il file .docx steganografato è stato salvato nella directory stego")
 
 
 if __name__ == '__main__':
-    # START
-    PATH_FILE_EXTRACTED = input("Inserisci il file da steganografare:")
-    # secret message
-    MESSAGE = input("inserisci testo segreto: ")
-    # inserisci passphrase per la generazione della chiave simmetrica
-    PASSWORD = input("Inserisci password per la cifratura del testo: ")
+    # Read input file to apply Steganographic method (es. ./word/document.xml)
+    path_file_extracted = input("Inserisci il file da steganografare:")
 
-    encoding(MESSAGE, PASSWORD, PATH_FILE_EXTRACTED)
+    # Message to hide
+    message = input("Inserisci il testo da nascondere:")
+
+    # Insert passphrase to generate symmectric key for encrypt/decrypt
+    password = input("Inserisci password per cifrare il testo:")
+
+    encoding(message, password, path_file_extracted)
     exit(0)
 
 

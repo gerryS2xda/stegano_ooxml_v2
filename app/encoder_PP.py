@@ -115,12 +115,12 @@ def check_if_available_space(index, paragraph, information_to_encode_bits, offse
         return False
     return True
 
-def printStatistics(total_counter_words,total_counter_inclusion, information_to_encode_bits):
-    print("CAPACITA' TOTALE :" + total_counter_words.__str__())
+def printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits):
+    print("CAPACITA' TOTALE :" + total_counter_characters.__str__())
     print("CAPACITA' INCLUSIONE:" + total_counter_inclusion.__str__())
     print("MINIMO DI BITS DA INIETTARE: " + len(information_to_encode_bits).__str__())
 
-def createFileStego(tree,name_file):
+def createFileStego(tree, name_file):
     tree.write("stego/slide1.xml")
     copy_tree("input/" + name_file + "/file_extracted", "stego/file_extracted")
     shutil.copy("stego/slide1.xml", "stego/file_extracted/ppt/slides")
@@ -153,8 +153,9 @@ def encoding(message, password, path_file_extracted):
     
     #Step 3 -> Aggiungi alla fine del testo cifrato il carattere di divisione "%".
     information_to_encode_bits = utils.text_to_binary(encrypted.decode("utf-8")) + utils.text_to_binary(utils.MAGIC_CHAR_SPLIT)
-    
-    total_counter_words = 0
+
+    # Inizializzazione di un contatore di caratteri e di inclusione
+    total_counter_characters = 0
     total_counter_inclusion = 0
     print("INIEZIONE IN CORSO .....")
     
@@ -185,7 +186,6 @@ def encoding(message, password, path_file_extracted):
 
             index_run_element = 1
             offset_run_element = 1
-            print(" Run: " + len(run_elements).__str__())
             # Aggiungi tutti quei nodi != RUN_ELEMENT_TAG e memorizzali in un array
             other_childs_paragraph = []
             for child in paragraph.findall("./"):
@@ -195,61 +195,63 @@ def encoding(message, password, path_file_extracted):
             bmk_attr_val_prec = 0
             
             while index_run_element <= len(run_elements):
-                #Computa valore da assegnare all'attributo "bmk" di <a:rPr> usato come marker split
+                # Computa valore da assegnare all'attributo "bmk" di <a:rPr> usato come marker split
                 bmk_attr_val_prec = random_num_except(bmk_attr_val_prec)
 
-                #Step 9 -> 	Inizializza il contatore N=1 per accumulare il numero di caratteri da dividere. 
-                #Successivamente, conta il numero di caratteri in T, e memorizzali nella variabile C. 
+                # Step 9 -> Inizializza il contatore N=1 per accumulare il numero di caratteri da dividere.
+                # Successivamente, conta il numero di caratteri in T, e memorizzali nella variabile C.
                 N = 1
                 txt_elem_tag = run_elements[index_run_element-1].find("./" + TEXT_ELEMENT_TAG)
                 count = len(txt_elem_tag.text)
-                total_counter_words += count
+                total_counter_characters += count
                 
-                #Se il run element corrente non contiene tag <a:rPr>, si creare e aggiunge tale tag
+                # Se il run element corrente non contiene tag <a:rPr>, si creare e aggiunge tale tag
                 if run_elements[index_run_element-1].find("./" + RUN_ELEMENT_PROPERTY_TAG) == None:
                     rpr = etree.Element(RUN_ELEMENT_PROPERTY_TAG)
                     rpr.set(RPR_ATTRIBUTE_FOR_MARKER_SPLIT, bmk_attr_val_prec.__str__()) #aggiungi attributo "bmk"
                     run_elements[index_run_element-1].append(rpr)
-                #Altrimenti, se non contiene l'attributo "RPR_ATTRIBUTE_FOR_MARKER_SPLIT", aggiungilo a <a:rPr>
+                # Altrimenti, se non contiene l'attributo "RPR_ATTRIBUTE_FOR_MARKER_SPLIT", aggiungilo a <a:rPr>
                 elif run_elements[index_run_element-1].find("./" + RUN_ELEMENT_PROPERTY_TAG).get(RPR_ATTRIBUTE_FOR_MARKER_SPLIT) == None:
                     run_elements[index_run_element-1].find("./" + RUN_ELEMENT_PROPERTY_TAG).set(RPR_ATTRIBUTE_FOR_MARKER_SPLIT, bmk_attr_val_prec.__str__()) #aggiungi attributo "bmk"
 
                 while count >= 1:
-                    #Check if enough space to inject information coded remain
+                    # Check if enough space to inject information coded remain
                     if(check_if_available_space(i, paragraph, information_to_encode_bits, offset_run_element, count) == False):
                         break
 
-                    #Step 10 -> Leggi un bit da "information_to_encode_bits" in modo circolare e decrementa "count"
-                    #Caso a) Se il bit è 0, allora incrementa N
+                    # Step 10 -> Leggi un bit da "information_to_encode_bits" in modo circolare e decrementa "count"
+                    # Caso a) Se il bit è 0, allora incrementa N
                     if information_to_encode_bits[i % len(information_to_encode_bits)] == "0":
                         N +=1
-                    #Caso b)
+                    # Caso b)
                     elif (paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_element).__str__() + "]/" + TEXT_ELEMENT_TAG)) != None:
                         txt_elem_tag = paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_element).__str__() + "]/" + TEXT_ELEMENT_TAG)
                         text = txt_elem_tag.text
                         new_run_element = copy.copy(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_element).__str__() + "]"))
                         
-                        #Step 11 -> Aggiungi o modifica l’attributo bmk al tag <a:rPr> usato come marker di split    
+                        # Step 11 -> Aggiungi o modifica l’attributo bmk al tag <a:rPr> usato come marker di split
                         new_run_element.find("./" + RUN_ELEMENT_PROPERTY_TAG).set(RPR_ATTRIBUTE_FOR_MARKER_SPLIT, (random_num_except(bmk_attr_val_prec)).__str__())
 
+                        # Aggiungi un nuovo <r> e setta il tag <t>
                         txt_elem_tag.text = text[0:N]
                         new_run_element.find("./" + TEXT_ELEMENT_TAG).text = text[N:]
                         paragraph.insert(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_element).__str__() + "]").getparent().index(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_element).__str__() + "]")) + 1, new_run_element)
                         offset_run_element += 1
-                        if len(text[N:]) == 0: #necessario altrimenti crea un text element vuoto (<a:t/>) che viene rimosso quando si salva il file
+                        if len(text[N:]) == 0: # necessario altrimenti crea un text element vuoto (<a:t/>) che viene rimosso quando si salva il file
                             new_run_element.find("./" + TEXT_ELEMENT_TAG).text = " "
+                        # optimization -> remove tree.write("stego/document.xml")
                         N = 1
                     i+=1
                     count -= 1
                     # Step 12 -> Ritorna allo step 10 finché C è >= 1
                 index_run_element += 1
                 offset_run_element += 1
-                #Step 13 -> Ripeti dallo step 8 allo step 12 finché tutti gli elementi <a:r> in P non sono stati risolti
-            #Step 14 -> Ripeti dallo step 6 allo step 13 finché tutti i paragrafi P non sono stati risolti
-        #Step 15 -> Ripeti dallo step 4 allo step 14 finché tutti gli shape SP non sono stati risolti
-    #Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
+                # Step 13 -> Ripeti dallo step 8 allo step 12 finché tutti gli elementi <a:r> in P non sono stati risolti
+            # Step 14 -> Ripeti dallo step 6 allo step 13 finché tutti i paragrafi P non sono stati risolti
+        # Step 15 -> Ripeti dallo step 4 allo step 14 finché tutti gli shape SP non sono stati risolti
+    # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
     total_counter_inclusion = i
-    printStatistics(total_counter_words, total_counter_inclusion, information_to_encode_bits)
+    printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits)
     #Crea il file ".pptx" contenente il testo segreto
     createFileStego(tree, path_file_extracted)
     print("Il file .pptx steganografato è stato salvato nella directory \"stego\"")
