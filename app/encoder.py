@@ -2,7 +2,6 @@ import os
 import shutil
 import zipfile
 from distutils.dir_util import copy_tree
-
 from lxml import etree
 import copy
 import random
@@ -42,7 +41,7 @@ def merge_possible_run_elements(paragraph):
         while mismatch != True and j < len(run_property_elements):
             for child_of_node in node:
                 child_of_node_j = run_property_elements[j].find("./"  + child_of_node.tag)
-                if child_of_node_j == None or (child_of_node.tag != SZCS_TAG and child_of_node_j.attrib != child_of_node.attrib):
+                if child_of_node_j == None or (child_of_node.tag != SZCS_TAG and (len(child_of_node_j.keys()) != len(child_of_node.keys()))):
                     mismatch = True
                     break
             #merge nodi fino al j - 1 elemento
@@ -110,7 +109,7 @@ def check_if_available_space(index,paragraph,information_to_encode_bits,offset_r
     return True
 
 
-def printStat(total_counter_characters, total_counter_inclusion, information_to_encode_bits):
+def printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits):
     print("CAPACITA' TOTALE :" + total_counter_characters.__str__())
     print("CAPACITA' INCLUSIONE:" + total_counter_inclusion.__str__())
     print("MINIMO DI BITS DA INIETTARE: " + len(information_to_encode_bits).__str__())
@@ -141,11 +140,9 @@ def encoding(message, password, path_file_extracted):
     # step 1 -> Leggi il codice dal file "document.xml", relativo al documento D
     tree = etree.parse("input/" + path_file_extracted + '/file_extracted/word/document.xml')
     root = tree.getroot()
-
     # step 2 -> Cifra il testo segreto H mediante l’algoritmo AES-CBC, usando la chiave simmetrica
-    encrypted = utils.encrypt(message, password)
+    encrypted = utils.encrypt(password, message)
     print(encrypted)
-
     # step 3 -> aggiungi alla fine del testo cifrato il carattere di divisione "%"
     information_to_encode_bits = utils.text_to_binary(encrypted.decode('utf-8')) + utils.text_to_binary(
         utils.MAGIC_CHAR_SPLIT)
@@ -156,71 +153,71 @@ def encoding(message, password, path_file_extracted):
     print("INIEZIONE IN CORSO .....")
     paragraphs = root.findall("./" + BODY_TAG + "/" + PARAGRAPH_TAG)
     i = 0
-    # step 14 -> Ripeti step 6 - step 13 finché tutti gli elementi <w:r> in P  non sono stati risolti;
     for paragraph in paragraphs:
-        #step 5 -> IF (2 o più elementi <w:r> consecutivi in P hanno gli stessi attributi) THEN unisci gli elementi consecutivi <w:r>.;
+        # step 5 -> IF (2 o più elementi <w:r> consecutivi in P hanno gli stessi attributi) THEN unisci gli elementi consecutivi <w:r>.;
         merge_possible_run_elements(paragraph)
 
+        # Step 6 -> Estrai elemento <w:r> in R e i corrispondenti "text element" <w:t> in T
         run_elements = []
         for node in paragraph.findall("./" + RUN_ELEMENT_TAG):
-            if node.find("./" + TEXT_TAG) != None:
+            if node.find("./" +  TEXT_TAG) != None:
                 run_elements.append(node)
         i_run_elements = 1
         offset_run_elem = 1
 
-        # aggiungo tutti i nodi != RUN_ELEMENT_TAG e li memorizzo in un array
+        # Aggiungi tutti quei tag != RUN_ELEMENT_TAG e memorizzali in un array
         arr_childs_par_to_save = []
         for child_paragraph in paragraph.findall("./"):
             if child_paragraph.tag != RUN_ELEMENT_TAG:
                 arr_childs_par_to_save.append(child_paragraph)
-                #paragraph.remove(child_paragraph)
-        szcs_val_prec = 0
-        #step 14 -> risolvi tutti gli elementi <w:r> in P
-        while i_run_elements <= len(run_elements):
-            szcs_val_prec = random_num_except(szcs_val_prec)
-            # step8 -> Inizializza il contatore N=1 per accumulare il numero di caratteri da dividere. Successivamente, conta il numero di caratteri in T, e memorizzali nella variabile C.
-            N = 1
-            total_counter_characters += len(run_elements[i_run_elements - 1].find("./" + TEXT_TAG).text)
 
-            tag_element = run_elements[i_run_elements - 1].find("./" + TEXT_TAG)
-            # se non contiene il tag rpr lo aggiungo al run element corrente
+        szcs_val_prec = 0
+        while i_run_elements <= len(run_elements):
+            # Computa valore da assegnare all'attributo "w:val" di <szCs> usato come marker split
+            szcs_val_prec = random_num_except(szcs_val_prec)
+
+            # Step 8 -> Inizializza il contatore N=1 per accumulare il numero di caratteri da dividere.
+            # Successivamente, conta il numero di caratteri in T e memorizzali nella variabile C.
+            N = 1
+            txt_element_tag = run_elements[i_run_elements - 1].find("./" + TEXT_TAG)
+            count = len(txt_element_tag.text)
+            total_counter_characters += count
+
+            # Se il run element corrente non contiene tag <rPr>, si crea e aggiunge tale tag
             if run_elements[i_run_elements - 1].find("./" + RUN_ELEM_PROPERTY_TAG) == None:
                 rpr = etree.Element(RUN_ELEM_PROPERTY_TAG)
                 rpr.append(etree.Element(SZCS_TAG))
                 rpr.find("./" + SZCS_TAG).set(PREFIX_WORD_PROC + "val", szcs_val_prec.__str__())
                 run_elements[i_run_elements - 1].append(rpr)
-            # se non contiene il tag szCS lo aggiungo al run element corrente
+            # Altrimenti, se non contiene il tag <szCS> lo aggiungo al run element corrente
             elif run_elements[i_run_elements - 1].find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG) == None:
                     run_elements[i_run_elements - 1].find("./" + RUN_ELEM_PROPERTY_TAG).append(etree.Element(SZCS_TAG))
-                    run_elements[i_run_elements - 1].find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG).set(PREFIX_WORD_PROC + "val", szcs_val_prec.__str__())
+                    run_elements[i_run_elements - 1].find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG).set(PREFIX_WORD_PROC + "val",szcs_val_prec.__str__())
 
-            # step 8 -> Inizializza il contatore N=1 per accumulare il numero di caratteri da dividere. Successivamente, conta il numero di caratteri in T, e memorizzali nella variabile C.
-            count = len(tag_element.text)
-            #step 12 -> Ritorna allo step 9 fino a quando C >= 1;
-            while count >=1:
-                #check if enough space to inject information coded remain
-                if(check_if_available_space(i, paragraph, information_to_encode_bits, offset_run_elem,count) == False):
+            while count >= 1:
+                # Check if enough space to inject information coded remain
+                if(check_if_available_space(i,paragraph,information_to_encode_bits,offset_run_elem,count) == False):
                     break
-                #step 9,10,11
-                # case a
+                # Step 9 -> Leggi un bit da "information_to_encode_bits" in modo circolare e decrementa "count"
+                # Caso a) Se il bit è 0, allora incrementa N
                 if(information_to_encode_bits[i % len(information_to_encode_bits)]) == "0":
                     N += 1
-                #case b
+                # Caso b
                 elif paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]" + "/" + TEXT_TAG) != None:
                     tag_element = paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]" + "/" + TEXT_TAG)
                     text = tag_element.text
                     new_run_elem = copy.copy(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]"))
-                    # step 8 -> Modify the splitting mark <w:szCs> in the run elements alternatively.
+                    # step 10 -> Modify the splitting mark <w:szCs> in the run elements alternatively.
                     if new_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG) != None:
                         new_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG).set(PREFIX_WORD_PROC + "val",random_num_except(szcs_val_prec).__str__())
-                    #aggiungo tag SZCS all'elemento rpr
+                    # Aggiungo tag <w:szCs> all'elemento <w:rPr>
                     else:
                         new_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG).insert(1,etree.Element(SZCS_TAG))
                         new_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG).set(PREFIX_WORD_PROC + "val", random_num_except(szcs_val_prec).__str__())
 
                     tag_element.text = text[0:N]
                     new_run_elem.find("./" + TEXT_TAG).text = text[N:]
-                    #aggiungo space preserve
+                    # Aggiungo space preserve
                     tag_element.set("{http://www.w3.org/XML/1998/namespace}space","preserve")
                     new_run_elem.find("./" + TEXT_TAG).set("{http://www.w3.org/XML/1998/namespace}space","preserve")
                     paragraph.insert(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]").getparent().index(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]")) + 1,new_run_elem)
@@ -232,14 +229,16 @@ def encoding(message, password, path_file_extracted):
                     N = 1
                 i += 1
                 count -= 1
-
-                # step 7 -> Go to step 6 until the value of C is one.
+                # step 11 -> Ritorna allo step 9 fino a quando C >= 1;
             i_run_elements += 1
             offset_run_elem += 1
+            # Step 12 -> Ripeti dallo step 6 allo step 11 finché tutti gli elementi <w:r> in P non sono stati risolti;
+        # Step 13 -> Ripeti dallo step 4 allo step 12 finché tutti i paragrafi P non sono stati risolti.
+    # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
     total_counter_inclusion = i
-    printStat(total_counter_characters, total_counter_inclusion, information_to_encode_bits)
-    createFileStego(tree, path_file_extracted)
-    print("Il file .docx steganografato è stato salvato nella directory stego")
+    printStatistics(total_counter_characters,total_counter_inclusion,information_to_encode_bits)
+    createFileStego(tree,path_file_extracted)
+    print("il file .docx steganografato è stato salvato nella directory stego")
 
 
 if __name__ == '__main__':
@@ -247,14 +246,11 @@ if __name__ == '__main__':
     path_file_extracted = input("Inserisci il file da steganografare:")
 
     # Message to hide
-    message = input("Inserisci il testo da nascondere:")
+    message = input("inserisci testo segreto: ")
 
     # Insert passphrase to generate symmectric key for encrypt/decrypt
-    password = input("Inserisci password per cifrare il testo:")
+    password = input("Inserisci password per la cifratura del testo: ")
 
     encoding(message, password, path_file_extracted)
     exit(0)
-
-
-
 
