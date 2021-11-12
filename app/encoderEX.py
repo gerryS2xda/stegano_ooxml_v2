@@ -182,7 +182,7 @@ def encoding(message, password, path_file_extracted):
         index_run_element = 1
         offset_run_elem = 1
 
-        # Aggiungi tutti quei nodi != RUN_ELEMENT_TAG e memorizzali in un array
+        # Aggiungi tutti quei tag != RUN_ELEMENT_TAG e memorizzali in un array
         other_childs_paragraph = []
         for child_paragraph in si.findall("./"):
             if child_paragraph.tag != RUN_ELEMENT_TAG:
@@ -193,7 +193,7 @@ def encoding(message, password, path_file_extracted):
             charset_val = set_charset_value(charset_val)
 
             # Step 8 -> Inizializza il contatore N=1 per accumulare il numero di caratteri da dividere.
-            # Successivamente, conta il numero di caratteri in T, e memorizzali nella variabile C.
+            # Successivamente, conta il numero di caratteri in T e memorizzali nella variabile C.
             N = 1
             txt_elem_tag = run_elements[index_run_element - 1].find("./" + TEXT_TAG)
             count = len(txt_elem_tag.text)

@@ -42,7 +42,6 @@ def decoding(password, path_filename_to_extract):
                 bmk_attr_rPr_tag = curr_run_elem.find("./" + RUN_ELEMENT_PROPERTY_TAG).get(RPR_ATTRIBUTE_FOR_MARKER_SPLIT)
                 if ((i_run_elements + 1) < len(run_elements)) and (bmk_attr_rPr_tag != None) and (bmk_attr_rPr_tag != "0"):
                     next_run_elem = run_elements[i_run_elements + 1]
-                    j = i_run_elements + 1
                     curr_property_elements = curr_run_elem.find("./" + RUN_ELEMENT_PROPERTY_TAG)
                     # check if tag RPR is present
                     if curr_property_elements != None:
@@ -68,8 +67,10 @@ def decoding(password, path_filename_to_extract):
                         text_tag = curr_run_elem.find("./" + TEXT_ELEMENT_TAG).text
                         message += ("0" * (len(text_tag) - 1))
 
-            #step 6 -> repeat step 2 to step 5 until all paragraph elements have been addressed
+                # Step 8 -> Ripeti dallo step 5 allo step 7 finché tutti gli elementi <a:r> in P non sono stati risolti
                 i_run_elements += 1
+            # Step 9 -> Ripeti dallo step 4 allo step 8 finché tutti i paragrafi P non sono stati risolti
+        # Step 10 -> Ripeti dallo step 2 allo step 8 finché tutti gli shape SP non sono stati risolti.
 
     #step 11 -> Estrai il testo segreto H da M.
     string_enc = "".join(chr(int("".join(map(str, message[i:i+8])), 2)) for i in range(0, len(message), 8))

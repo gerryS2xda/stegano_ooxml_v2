@@ -171,7 +171,6 @@ def encoding(message, password, path_file_extracted):
 
         #Step 6 -> Estrai paragrafo <a:p> in P
         paragraphs = txBody.findall("./" + PARAGRAPH_TAG)
-        print("i:" + i.__str__() + " Paragraphs: " + len(paragraphs).__str__())
         for paragraph in paragraphs:
             #Step 7 -> IF (2 o più elementi <a:r> consecutivi in P hanno gli stessi attributi) THEN unisci gli elementi consecutivi <a:r>; 
             merge_possible_run_elements(paragraph)
@@ -186,7 +185,7 @@ def encoding(message, password, path_file_extracted):
 
             index_run_element = 1
             offset_run_element = 1
-            # Aggiungi tutti quei nodi != RUN_ELEMENT_TAG e memorizzali in un array
+            # Aggiungi tutti quei tag != RUN_ELEMENT_TAG e memorizzali in un array
             other_childs_paragraph = []
             for child in paragraph.findall("./"):
                 if child.tag != RUN_ELEMENT_TAG:
