@@ -155,6 +155,7 @@ def encoding(message, password, path_file_extracted):
     total_counter_inclusion = 0
     print("INIEZIONE IN CORSO .....")
 
+    # Step 4 -> Estrai tutti gli string item <si> presenti in P
     string_items = root.findall("./" + STRING_ITEM_TAG)
     i = 0
     for si in string_items:
@@ -181,12 +182,6 @@ def encoding(message, password, path_file_extracted):
                 run_elements.append(node)
         index_run_element = 1
         offset_run_elem = 1
-
-        # Aggiungi tutti quei tag != RUN_ELEMENT_TAG e memorizzali in un array
-        other_childs_paragraph = []
-        for child_paragraph in si.findall("./"):
-            if child_paragraph.tag != RUN_ELEMENT_TAG:
-                other_childs_paragraph.append(child_paragraph)
 
         while index_run_element <= len(run_elements):
             # Computa valore da assegnare all'attributo "val" di <charset> usato come marker split
@@ -262,6 +257,9 @@ def encoding(message, password, path_file_extracted):
     # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
     total_counter_inclusion = i
     printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits)
+    # Se il numero di bit del cifrato da iniettare è superiore alla capacità del documento di am-mettere lo split del contenuto testuale -> annulla codifica
+    if len(information_to_encode_bits) > total_counter_inclusion:
+        print("non è stato possibile iniettare il testo segreto poichè presenta un numero di bits maggiori della capacità di inclusione")
     createFileStego(tree, path_file_extracted)
     print("Il file .xlsx steganografato è stato salvato nella directory \"stego\"")
 

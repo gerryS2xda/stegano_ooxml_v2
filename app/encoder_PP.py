@@ -159,7 +159,7 @@ def encoding(message, password, path_file_extracted):
     total_counter_inclusion = 0
     print("INIEZIONE IN CORSO .....")
     
-    #Step 4 -> Estrai tutti gli shape <p:sp> presenti in SP
+    # Step 4 -> Estrai tutti gli shape <p:sp> presenti in SP
     shapes = root.findall("./" + CONTENT_SLIDE_TREE_TAG + "/" + SHAPE_TREE_TAG + "/" + SHAPE_TAG)
     i = 0
 
@@ -185,14 +185,7 @@ def encoding(message, password, path_file_extracted):
 
             index_run_element = 1
             offset_run_element = 1
-            # Aggiungi tutti quei tag != RUN_ELEMENT_TAG e memorizzali in un array
-            other_childs_paragraph = []
-            for child in paragraph.findall("./"):
-                if child.tag != RUN_ELEMENT_TAG:
-                    other_childs_paragraph.append(child)
-                    
             bmk_attr_val_prec = 0
-            
             while index_run_element <= len(run_elements):
                 # Computa valore da assegnare all'attributo "bmk" di <a:rPr> usato come marker split
                 bmk_attr_val_prec = random_num_except(bmk_attr_val_prec)
@@ -251,6 +244,9 @@ def encoding(message, password, path_file_extracted):
     # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
     total_counter_inclusion = i
     printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits)
+    # Se il numero di bit del cifrato da iniettare è superiore alla capacità del documento di am-mettere lo split del contenuto testuale -> annulla codifica
+    if len(information_to_encode_bits) > total_counter_inclusion:
+        print("non è stato possibile iniettare il testo segreto poichè presenta un numero di bits maggiori della capacità di inclusione")
     #Crea il file ".pptx" contenente il testo segreto
     createFileStego(tree, path_file_extracted)
     print("Il file .pptx steganografato è stato salvato nella directory \"stego\"")

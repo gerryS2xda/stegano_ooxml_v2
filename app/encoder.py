@@ -153,6 +153,7 @@ def encoding(message, password, path_file_extracted):
     print("INIEZIONE IN CORSO .....")
     paragraphs = root.findall("./" + BODY_TAG + "/" + PARAGRAPH_TAG)
     i = 0
+    # Step 4 -> Estrai tutti i paragrafi <w:p> presenti in P
     for paragraph in paragraphs:
         # step 5 -> IF (2 o più elementi <w:r> consecutivi in P hanno gli stessi attributi) THEN unisci gli elementi consecutivi <w:r>.;
         merge_possible_run_elements(paragraph)
@@ -164,12 +165,6 @@ def encoding(message, password, path_file_extracted):
                 run_elements.append(node)
         i_run_elements = 1
         offset_run_elem = 1
-
-        # Aggiungi tutti quei tag != RUN_ELEMENT_TAG e memorizzali in un array
-        arr_childs_par_to_save = []
-        for child_paragraph in paragraph.findall("./"):
-            if child_paragraph.tag != RUN_ELEMENT_TAG:
-                arr_childs_par_to_save.append(child_paragraph)
 
         szcs_val_prec = 0
         while i_run_elements <= len(run_elements):
@@ -220,7 +215,7 @@ def encoding(message, password, path_file_extracted):
                     # Aggiungo space preserve
                     tag_element.set("{http://www.w3.org/XML/1998/namespace}space","preserve")
                     new_run_elem.find("./" + TEXT_TAG).set("{http://www.w3.org/XML/1998/namespace}space","preserve")
-                    paragraph.insert(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]").getparent().index(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]")) + 1,new_run_elem)
+                    paragraph.insert(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]").getparent().index(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]")) + 1, new_run_elem)
                     offset_run_elem += 1
                     if len(text[N:]) == 0 and new_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + VANISH_ELEM_TAG) == None:
                         new_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG).append(etree.Element(VANISH_ELEM_TAG))
@@ -236,10 +231,12 @@ def encoding(message, password, path_file_extracted):
         # Step 13 -> Ripeti dallo step 4 allo step 12 finché tutti i paragrafi P non sono stati risolti.
     # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
     total_counter_inclusion = i
-    printStatistics(total_counter_characters,total_counter_inclusion,information_to_encode_bits)
-    createFileStego(tree,path_file_extracted)
+    printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits)
+    # Se il numero di bit del cifrato da iniettare è superiore alla capacità del documento di am-mettere lo split del contenuto testuale -> annulla codifica
+    if len(information_to_encode_bits) > total_counter_inclusion:
+        print("non è stato possibile iniettare il testo segreto poichè presenta un numero di bits maggiori della capacità di inclusione")
+    createFileStego(tree, path_file_extracted)
     print("il file .docx steganografato è stato salvato nella directory stego")
-
 
 if __name__ == '__main__':
     # Read input file to apply Steganographic method (es. ./word/document.xml)
