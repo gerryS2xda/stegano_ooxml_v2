@@ -115,10 +115,11 @@ def check_if_available_space(index, paragraph, information_to_encode_bits, offse
         return False
     return True
 
-def printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits):
-    print("CAPACITA' TOTALE :" + total_counter_characters.__str__())
-    print("CAPACITA' INCLUSIONE:" + total_counter_inclusion.__str__())
-    print("MINIMO DI BITS DA INIETTARE: " + len(information_to_encode_bits).__str__())
+def printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text):
+    print("Capacità totale (# caratteri contenuto testuale): " + total_counter_characters.__str__())
+    print("Capacità di inclusione (# caratteri usati): " + total_counter_inclusion.__str__())
+    print("Numero minimo di bits da iniettare per testo segreto: " + len(information_to_encode_bits).__str__())
+    print("Numero di volte in cui il testo segreto è stato iniettato: " + total_complete_repeat_segret_text.__str__())
 
 def createFileStego(tree, name_file):
     tree.write("stego/slide1.xml")
@@ -243,7 +244,8 @@ def encoding(message, password, path_file_extracted):
         # Step 15 -> Ripeti dallo step 4 allo step 14 finché tutti gli shape SP non sono stati risolti
     # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
     total_counter_inclusion = i
-    printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits)
+    total_complete_repeat_segret_text = total_counter_inclusion // len(information_to_encode_bits)  # numero di volte in cui il testo segreto è stato incapsulato
+    printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text)
     # Se il numero di bit del cifrato da iniettare è superiore alla capacità del documento di am-mettere lo split del contenuto testuale -> annulla codifica
     if len(information_to_encode_bits) > total_counter_inclusion:
         print("non è stato possibile iniettare il testo segreto poichè presenta un numero di bits maggiori della capacità di inclusione")
