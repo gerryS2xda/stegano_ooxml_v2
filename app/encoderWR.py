@@ -1,6 +1,7 @@
 import os
 import shutil
 import zipfile
+import sys
 from distutils.dir_util import copy_tree
 from lxml import etree
 import copy
@@ -115,9 +116,9 @@ def printStatistics(total_counter_characters, total_counter_inclusion, informati
     print("Numero minimo di bits da iniettare per testo segreto: " + len(information_to_encode_bits).__str__())
     print("Numero di volte in cui il testo segreto è stato iniettato: " + total_complete_repeat_segret_text.__str__())
 
-def createFileStego(tree,name_file):
+def createFileStego(tree, path_file_extracted):
     tree.write("stego/document.xml")
-    copy_tree("input/" + name_file + "/file_extracted", "stego/file_extracted")
+    copy_tree(path_file_extracted, "stego/file_extracted")
     shutil.copy("stego/document.xml", "stego/file_extracted/word")
     zf = zipfile.ZipFile("stego/stego.zip", "w",zipfile.ZIP_DEFLATED)
     for dirname, subdirs, files in os.walk("./stego/file_extracted"):
@@ -139,7 +140,7 @@ def createFileStego(tree,name_file):
 
 def encoding(message, password, path_file_extracted):
     # step 1 -> Leggi il codice dal file "document.xml", relativo al documento D
-    tree = etree.parse("input/" + path_file_extracted + '/file_extracted/word/document.xml')
+    tree = etree.parse(path_file_extracted + "/word/document.xml")
     root = tree.getroot()
     # step 2 -> Cifra il testo segreto H mediante l’algoritmo AES-CBC, usando la chiave simmetrica
     encrypted = utils.encrypt(password, message)
@@ -230,26 +231,18 @@ def encoding(message, password, path_file_extracted):
             offset_run_elem += 1
             # Step 12 -> Ripeti dallo step 6 allo step 11 finché tutti gli elementi <w:r> in P non sono stati risolti;
         # Step 13 -> Ripeti dallo step 4 allo step 12 finché tutti i paragrafi P non sono stati risolti.
-    # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
+    # Verifica se il file dato in input ha la capacità di contenere la rappresentazione in bit del testo segreto cifrato
     total_counter_inclusion = i
     total_complete_repeat_segret_text = total_counter_inclusion // len(information_to_encode_bits) # numero di volte in cui il testo segreto è stato incapsulato
-    printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text)
-    # Se il numero di bit del cifrato da iniettare è superiore alla capacità del documento di am-mettere lo split del contenuto testuale -> annulla codifica
+    # Se il numero di bit del cifrato da iniettare è superiore alla capacità del documento di ammettere lo split del contenuto testuale -> annulla codifica
     if len(information_to_encode_bits) > total_counter_inclusion:
-        print("non è stato possibile iniettare il testo segreto poichè presenta un numero di bits maggiori della capacità di inclusione")
+        sys.exit("Non è stato possibile iniettare il testo segreto poichè presenta un numero di bits maggiori della capacità di inclusione!!\nFine!")
+
+    # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
+    printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text)
+
+    # Crea il file steganografato
     createFileStego(tree, path_file_extracted)
-    print("il file .docx steganografato è stato salvato nella directory stego")
+    print("il file .docx steganografato è stato salvato nella directory \"stego\"")
 
-if __name__ == '__main__':
-    # Read input file to apply Steganographic method (es. ./word/document.xml)
-    path_file_extracted = input("Inserisci il file da steganografare:")
-
-    # Message to hide
-    message = input("inserisci testo segreto: ")
-
-    # Insert passphrase to generate symmectric key for encrypt/decrypt
-    password = input("Inserisci password per la cifratura del testo: ")
-
-    encoding(message, password, path_file_extracted)
-    exit(0)
 

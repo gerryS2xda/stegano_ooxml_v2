@@ -82,21 +82,3 @@ def decoding(password, path_filename_to_extract):
         except:
             print("una duplicazione del testo segreto non può essere decifrata poichè incompleta --> " + p)
             continue
-
-#Main
-if __name__ == '__main__':
-    path_filename_to_extract = "stego/slide1.xml"
-    password = input("inserisci la password per decifrare il testo: ")
-
-    decoding(password, path_filename_to_extract)
-
-    exit(0)
-
-
-
-
-
-
-
-
-

@@ -1,6 +1,7 @@
 import os
 import shutil
 import zipfile
+import sys
 from distutils.dir_util import copy_tree
 from lxml import etree
 import copy 
@@ -121,9 +122,9 @@ def printStatistics(total_counter_characters, total_counter_inclusion, informati
     print("Numero minimo di bits da iniettare per testo segreto: " + len(information_to_encode_bits).__str__())
     print("Numero di volte in cui il testo segreto è stato iniettato: " + total_complete_repeat_segret_text.__str__())
 
-def createFileStego(tree, name_file):
+def createFileStego(tree, path_file_extracted):
     tree.write("stego/slide1.xml")
-    copy_tree("input/" + name_file + "/file_extracted", "stego/file_extracted")
+    copy_tree(path_file_extracted, "stego/file_extracted")
     shutil.copy("stego/slide1.xml", "stego/file_extracted/ppt/slides")
     zf = zipfile.ZipFile("stego/stego.zip", "w",zipfile.ZIP_DEFLATED)
     for dirname, subdirs, files in os.walk("./stego/file_extracted"):
@@ -146,7 +147,7 @@ def createFileStego(tree, name_file):
 #Applicazione del metodo dello split in cui si incapsula il testo segreto in binario in una slide usando paragrafo e run element
 def encoding(message, password, path_file_extracted):
     #Step 1 -> Leggi il codice dal file "slides/slide1.xml", relativo al documento D
-    tree = etree.parse("input/" + path_file_extracted + "/file_extracted/ppt/slides/slide1.xml")
+    tree = etree.parse(path_file_extracted + "/ppt/slides/slide1.xml")
     root = tree.getroot()  #get <p:sld> element
     
     #Step 2 -> Cifra il testo segreto H mediante l’algoritmo AES-CBC, usando la chiave simmetrica
@@ -242,30 +243,16 @@ def encoding(message, password, path_file_extracted):
                 # Step 13 -> Ripeti dallo step 8 allo step 12 finché tutti gli elementi <a:r> in P non sono stati risolti
             # Step 14 -> Ripeti dallo step 6 allo step 13 finché tutti i paragrafi P non sono stati risolti
         # Step 15 -> Ripeti dallo step 4 allo step 14 finché tutti gli shape SP non sono stati risolti
-    # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
+    # Verifica se il file dato in input ha la capacità di contenere la rappresentazione in bit del testo segreto cifrato
     total_counter_inclusion = i
     total_complete_repeat_segret_text = total_counter_inclusion // len(information_to_encode_bits)  # numero di volte in cui il testo segreto è stato incapsulato
-    printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text)
-    # Se il numero di bit del cifrato da iniettare è superiore alla capacità del documento di am-mettere lo split del contenuto testuale -> annulla codifica
+    # Se il numero di bit del cifrato da iniettare è superiore alla capacità del documento di ammettere lo split del contenuto testuale -> annulla codifica
     if len(information_to_encode_bits) > total_counter_inclusion:
-        print("non è stato possibile iniettare il testo segreto poichè presenta un numero di bits maggiori della capacità di inclusione")
+        sys.exit("Non è stato possibile iniettare il testo segreto poichè presenta un numero di bits maggiori della capacità di inclusione!!\nFine!")
+
+    # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
+    printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text)
+
     #Crea il file ".pptx" contenente il testo segreto
     createFileStego(tree, path_file_extracted)
     print("Il file .pptx steganografato è stato salvato nella directory \"stego\"")
-
-
-
-#Main 
-if __name__ == '__main__':
-    #Read input file to apply Steganographic method (es. ./slides/slide1.xml)
-    path_file_extracted = input("Inserisci il file da steganografare:")
-    
-    #Message to hide
-    message = input("Inserisci il testo da nascondere:")
-    
-    #Insert passphrase to generate symmectric key for encrypt/decrypt
-    password = input("Inserisci password per cifrare il testo:")
-
-    encoding(message, password, path_file_extracted)
-    
-    exit(0)
