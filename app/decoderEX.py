@@ -11,10 +11,10 @@ TEXT_TAG = PREFIX_EXCEL_PROC + "t"
 CHARSET_TAG = PREFIX_EXCEL_PROC + "charset"  #marker split tag
 
 
-def decoding(password, path_filename_to_extract):
+def decoding(password, path_file_extracted):
     message = ""
     # Step 1 -> Leggi il codice dal file "xl/sharedStrings.xml" relativo al workbook S
-    tree = etree.parse(path_filename_to_extract)
+    tree = etree.parse(path_file_extracted + '/xl/sharedStrings.xml')
     root = tree.getroot() # get <sst> element
 
     # Step 2 -> Estrai un "string item" <si> alla volta

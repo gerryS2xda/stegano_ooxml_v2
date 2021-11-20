@@ -10,10 +10,10 @@ BODY_TAG = PREFIX_WORD_PROC + "body"
 TEXT_TAG = PREFIX_WORD_PROC + "t"
 SZCS_TAG = PREFIX_WORD_PROC + "szCs"
 
-def decoding(password, path_filename_to_extract):
+def decoding(password, path_file_extracted):
     message = ""
     # Step 1 -> Leggi il codice dal file "document.xml", relativo al documento D
-    tree = etree.parse(path_filename_to_extract)
+    tree = etree.parse(path_file_extracted + "/word/document.xml")
     root = tree.getroot()
 
     # Step 2 -> Estrai un paragrafo <w:p> in P alla volta
