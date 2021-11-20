@@ -10,11 +10,9 @@ from app import decoderPP
 from app import decoderEX
 from app import utils
 
-FILE_EXTENSION_ACCEPTED = [".docx", ".pptx", ".xlsx"]
-
 if __name__ == '__main__':
     # Select mode to operate
-    print("Seleziona la modalità di esecuzione digitando: \"1\" - Encoder; \"2\" - Decoder; \"3\" - Clean working directory")
+    print("Seleziona la modalità di esecuzione digitando: \"1\" - Encoder; \"2\" - Decoder;")
     mode = input("Digita: ")
     if mode == "1":
         # Encoder mode
@@ -29,58 +27,66 @@ if __name__ == '__main__':
 
         # Check correct extension of input file
         input_file_extension = os.path.splitext(path_input_file)[1]
-        isFileExtensionCorrect = False
-        for ext in FILE_EXTENSION_ACCEPTED:
-            if input_file_extension == ext:
-                isFileExtensionCorrect = True
-                break
-        if not isFileExtensionCorrect:
-            sys.exit("Tipo di file sconosciuto!! Richiesto file \".docx, .pptx, .xlsx\"")
+        utils.check_correct_extension_inputfile(input_file_extension)
 
         # Extract file in working folder
-        if not os.path.exists("./test/working_directory"): # se non è la presente la working directory -> creala
-            os.mkdir("./test/working_directory")
-        os.rename(path_input_file, path_input_file + ".zip") # rinomina in zip file input temporaneamente per estrazione
-        with ZipFile(path_input_file + ".zip", "r") as input_file_zip:
-            print("Estrazione file in corso...")
-            if not os.path.exists("./test/working_directory/" + input_file_name):
-                os.mkdir("./test/working_directory/" + input_file_name)
-            if not os.path.exists("./test/working_directory/" + input_file_name + "/file_extracted"):
-                os.mkdir("./test/working_directory/" + input_file_name + "/file_extracted")
-            input_file_zip.extractall("./test/working_directory/" + input_file_name + "/file_extracted")
-        input_file_zip.close()
-        os.rename(path_input_file + ".zip", path_input_file)
+        path_working_directory = "./test/working_directory"
+        utils.extract_ooxml_input_file_in_working_directory(path_working_directory, path_input_file, input_file_name)
 
         # Message to hide
         message = input("Inserisci testo segreto: ")
 
-        # Insert passphrase to generate symmectric key for encrypt/decrypt
+        # Insert passphrase to generate symmectric key for encrypt
         password = input("Inserisci password per la cifratura del testo: ")
 
         # Select type of encoding by type of input file (i.e. fname.docx -> use encoder for docx)
-        path_file_extracted = "./test/working_directory/" + input_file_name + "/file_extracted"
-        if input_file_extension == FILE_EXTENSION_ACCEPTED[0]:
+        path_file_extracted = path_working_directory + "/" + input_file_name + "/file_extracted"
+        if input_file_extension == ".docx":
             print("Esecuzione text split method per un documento Word...")
             encoderWR.encoding(message, password, path_file_extracted)
-        elif input_file_extension == FILE_EXTENSION_ACCEPTED[1]:
+        elif input_file_extension == ".pptx":
             print("Esecuzione text split method per una presentazione PowerPoint...")
             encoderPP.encoding(message, password, path_file_extracted)
-        elif input_file_extension == FILE_EXTENSION_ACCEPTED[2]:
+        elif input_file_extension == ".xlsx":
             print("Esecuzione text split method per una cartella di fogli di lavoro Excel...")
             encoderEX.encoding(message, password, path_file_extracted)
+        # Remove input file folder with extracted file from "working_directory"
+        utils.remove_directory(path_working_directory + "/" + input_file_name)
     elif mode == "2":
         # Decoder mode
-        path_filename_to_extract = "stego/document.xml"
-        password = input("inserisci la password per decifrare il testo: ")
+        print("* * * * Decoder mode * * * *")
+        # Read input file to extract segret message (es. sample_file_stego.docx, sample_file_stego.pptx, sample_file_stego.xlsx)
+        input_file_name = input("Inserisci il nome del file steganografato (es. fname_stego.docx) presente nella directory \"stego\"): ")
 
-        #decoding(password, path_filename_to_extract)
-        exit(0)
-    elif mode == "3":
-        # Clean working directory
-        if os.path.exists("./test/working_directory"):
-            shutil.rmtree("./test/working_directory") # rimuovi l'intera directory
-        else:
-            print("\"working_directory\" è già vuota o non esiste!")
+        # Check existence of input file
+        path_input_file = "./stego/" + input_file_name
+        if not os.path.exists(path_input_file):
+            sys.exit("Il nome del file inserito non è presente nella directory \"stego\"")
+
+        # Check correct extension of input file
+        input_file_extension = os.path.splitext(path_input_file)[1]
+        utils.check_correct_extension_inputfile(input_file_extension)
+
+        # Extract file in working folder
+        path_working_directory = "./test/working_directory"
+        utils.extract_ooxml_input_file_in_working_directory(path_working_directory, path_input_file, input_file_name)
+
+        # Insert passphrase to generate symmectric key for decrypt
+        password = input("Inserisci password per decifrare il testo segreto: ")
+
+        # Select type of encoding by type of input file (i.e. fname.docx -> use encoder for docx)
+        path_file_extracted = path_working_directory + "/" + input_file_name + "/file_extracted"
+        if input_file_extension == ".docx":
+            print("Esecuzione text split method per estrazione di un testo segreto da un documento Word...")
+            decoderWR.decoding(password, path_file_extracted)
+        elif input_file_extension == ".pptx":
+            print("Esecuzione text split method per estrazione di un testo segreto da una presentazione PowerPoint...")
+            decoderPP.decoding(password, path_file_extracted)
+        elif input_file_extension == ".xlsx":
+            print("Esecuzione text split method per per estrazione di un testo segreto da cartella di fogli di lavoro Excel...")
+            decoderEX.decoding(password, path_file_extracted)
+        # Remove input file folder with extracted file from "working_directory"
+        utils.remove_directory(path_working_directory + "/" + input_file_name)
     else:
         sys.exit("Input digitato non è valido!! Fine!")
     exit(0)
