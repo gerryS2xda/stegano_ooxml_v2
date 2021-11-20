@@ -91,6 +91,7 @@ def merge_possible_run_elements(string_item):
             break
         i +=1
 
+# Verifica se vi è spazio per effettuare un'altra iniezione nel run corrente di base
 def check_if_available_space(index, string_item, information_to_encode_bits, offset_run_elem, count, charset_val):
     count_zero = 0
     j = index
@@ -111,13 +112,16 @@ def check_if_available_space(index, string_item, information_to_encode_bits, off
         return False
     return True
 
+# Stampa le statistiche in merito a caratteri totali del contenuto testuale, caratteri usati per inclusione, numero di bit testo segreto e quante volte è stato iniettato
 def printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text):
     print("Capacità totale (# caratteri contenuto testuale): " + total_counter_characters.__str__())
     print("Capacità di inclusione (# caratteri usati): " + total_counter_inclusion.__str__())
     print("Numero minimo di bits da iniettare per testo segreto: " + len(information_to_encode_bits).__str__())
     print("Numero di volte in cui il testo segreto è stato iniettato: " + total_complete_repeat_segret_text.__str__())
 
+# Crea il file ".xlsx" contenente "sharedStrings.xml" steganografato
 def createFileStego(tree, path_file_extracted):
+    input_file_name = os.path.splitext(os.path.split(os.path.split(path_file_extracted)[0])[1])[0]  # no estensione file
     tree.write("stego/sharedStrings.xml")
     copy_tree(path_file_extracted, "stego/file_extracted")
     shutil.copy("stego/sharedStrings.xml", "stego/file_extracted/xl")
@@ -132,13 +136,14 @@ def createFileStego(tree, path_file_extracted):
             zf.write(os.path.join(dirname, filename), path)
     zf.close()
     # Check if file exists before to rename zip file
-    if (os.path.exists('./stego/stego.xlsx')):
-        os.remove('./stego/stego.xlsx')
-    os.rename('./stego/stego.zip', './stego/stego.xlsx')
-    #os.remove('./stego/sharedStrings.xml')
+    if os.path.exists('./stego/' + input_file_name + '_stego.xlsx'):
+        os.remove('./stego/' + input_file_name + '_stego.xlsx')
+    os.rename('./stego/stego.zip', './stego/' + input_file_name + '_stego.xlsx')
+    os.remove('./stego/sharedStrings.xml')
     shutil.rmtree('./stego/file_extracted')
     return "stego/stego.zip"
 
+# Applicazione del metodo dello split in cui si incapsula il testo segreto in binario in "sharedStrings.xml" usando string item e run element
 def encoding(message, password, path_file_extracted):
     # Step 1 -> Leggi il codice dal file "xl/sharedStrings.xml", relativo al workbook D
     tree = etree.parse(path_file_extracted + '/xl/sharedStrings.xml')
@@ -261,6 +266,7 @@ def encoding(message, password, path_file_extracted):
     total_complete_repeat_segret_text = total_counter_inclusion // len(information_to_encode_bits)  # numero di volte in cui il testo segreto è stato incapsulato
     # Se il numero di bit del cifrato da iniettare è superiore alla capacità del documento di am-mettere lo split del contenuto testuale -> annulla codifica
     if len(information_to_encode_bits) > total_counter_inclusion:
+        utils.remove_directory(os.path.split(path_file_extracted)[0])
         sys.exit("Non è stato possibile iniettare il testo segreto poichè presenta un numero di bits maggiori della capacità di inclusione!!\nFine!")
 
     # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare

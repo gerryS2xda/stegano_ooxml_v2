@@ -18,13 +18,14 @@ BODY_TAG = PREFIX_WORD_PROC + "body"
 TEXT_TAG = PREFIX_WORD_PROC + "t"
 SZCS_TAG = PREFIX_WORD_PROC + "szCs"
 
-
+# Computa un valore casuale da assegnare escludendo quello che viene passato in input
 def random_num_except(except_num):
     numbers = list(range(1, 1900))
     if int(except_num) > 0:
         numbers.remove(int(except_num))
     return random.choice(numbers)
 
+# Merge di tutti i possibili "run element" che presentano le stesse caratteristiche (numero elementi XML figli)
 def merge_possible_run_elements(paragraph):
      run_property_elements = []
      #ricerca run elements nel paragrafo
@@ -91,8 +92,7 @@ def merge_possible_run_elements(paragraph):
             break
         i +=1
 
-
-
+# Verifica se vi è spazio per effettuare un'altra iniezione nel run corrente di base
 def check_if_available_space(index,paragraph,information_to_encode_bits,offset_run_elem,count):
     count_zero = 0
     j = index
@@ -109,14 +109,16 @@ def check_if_available_space(index,paragraph,information_to_encode_bits,offset_r
         return False
     return True
 
-
+# Stampa le statistiche in merito a caratteri totali del contenuto testuale, caratteri usati per inclusione, numero di bit testo segreto e quante volte è stato iniettato
 def printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text):
     print("Capacità totale (# caratteri contenuto testuale): " + total_counter_characters.__str__())
     print("Capacità di inclusione (# caratteri usati): " + total_counter_inclusion.__str__())
     print("Numero minimo di bits da iniettare per testo segreto: " + len(information_to_encode_bits).__str__())
     print("Numero di volte in cui il testo segreto è stato iniettato: " + total_complete_repeat_segret_text.__str__())
 
+# Crea il file ".docx" contenente "document.xml" steganografato
 def createFileStego(tree, path_file_extracted):
+    input_file_name = os.path.splitext(os.path.split(os.path.split(path_file_extracted)[0])[1])[0] # no estensione file
     tree.write("stego/document.xml")
     copy_tree(path_file_extracted, "stego/file_extracted")
     shutil.copy("stego/document.xml", "stego/file_extracted/word")
@@ -131,13 +133,13 @@ def createFileStego(tree, path_file_extracted):
             zf.write(os.path.join(dirname, filename),path)
     zf.close()
     # Check if file exists before to rename zip file
-    if (os.path.exists('./stego/stego.docx')):
-        os.remove('./stego/stego.docx')
-    os.rename('./stego/stego.zip', './stego/stego.docx')
-    #os.remove('./stego/document.xml')
+    if os.path.exists('./stego/' + input_file_name + '_stego.docx'):
+        os.remove('./stego/' + input_file_name + '_stego.docx')
+    os.rename('./stego/stego.zip', './stego/' + input_file_name + '_stego.docx')
+    os.remove('./stego/document.xml')
     shutil.rmtree('./stego/file_extracted')
-    return "stego/stego.zip"
 
+# Applicazione del metodo dello split in cui si incapsula il testo segreto in binario nel "document.xml" usando paragrafo e run element
 def encoding(message, password, path_file_extracted):
     # step 1 -> Leggi il codice dal file "document.xml", relativo al documento D
     tree = etree.parse(path_file_extracted + "/word/document.xml")
@@ -236,6 +238,7 @@ def encoding(message, password, path_file_extracted):
     total_complete_repeat_segret_text = total_counter_inclusion // len(information_to_encode_bits) # numero di volte in cui il testo segreto è stato incapsulato
     # Se il numero di bit del cifrato da iniettare è superiore alla capacità del documento di ammettere lo split del contenuto testuale -> annulla codifica
     if len(information_to_encode_bits) > total_counter_inclusion:
+        utils.remove_directory(os.path.split(path_file_extracted)[0])
         sys.exit("Non è stato possibile iniettare il testo segreto poichè presenta un numero di bits maggiori della capacità di inclusione!!\nFine!")
 
     # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
