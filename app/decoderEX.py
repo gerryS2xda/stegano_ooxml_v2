@@ -10,7 +10,7 @@ RUN_ELEMENT_PROPERTY_TAG = PREFIX_EXCEL_PROC + "rPr"
 TEXT_TAG = PREFIX_EXCEL_PROC + "t"
 CHARSET_TAG = PREFIX_EXCEL_PROC + "charset"  #marker split tag
 
-
+# Esecuzione algoritmo di decodifica che estrae e decifra il testo segreto cifrato presente nel file steganografato S dato in input
 def decoding(password, path_file_extracted):
     message = ""
     # Step 1 -> Leggi il codice dal file "xl/sharedStrings.xml" relativo al workbook S

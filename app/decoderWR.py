@@ -10,6 +10,7 @@ BODY_TAG = PREFIX_WORD_PROC + "body"
 TEXT_TAG = PREFIX_WORD_PROC + "t"
 SZCS_TAG = PREFIX_WORD_PROC + "szCs"
 
+# Esecuzione algoritmo di decodifica che estrae e decifra il testo segreto cifrato presente nel file steganografato S dato in input
 def decoding(password, path_file_extracted):
     message = ""
     # Step 1 -> Leggi il codice dal file "document.xml", relativo al documento D

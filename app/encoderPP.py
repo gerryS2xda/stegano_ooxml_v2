@@ -170,7 +170,7 @@ def encoding(message, password, path_file_extracted):
 
     # Step 3 -> Per ciascuna slide presente nella directory "ppt/slides" della presentazione D
     slides = os.listdir(path_file_extracted + "/ppt/slides")
-    for slide in slides:    # Rimuovi tutti i nomi del file che sono diversi da "slideX.xml"
+    for slide in slides:    # Rimuovi tutti i nomi dei file che sono diversi da "slideX.xml"
         if slide.find("slide") == -1:
             slides.remove(slide)
 

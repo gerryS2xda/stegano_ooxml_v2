@@ -56,7 +56,7 @@ if __name__ == '__main__':
         # Decoder mode
         print("* * * * Decoder mode * * * *")
         # Read input file to extract segret message (es. sample_file_stego.docx, sample_file_stego.pptx, sample_file_stego.xlsx)
-        input_file_name = input("Inserisci il nome del file steganografato (es. fname_stego.docx) presente nella directory \"stego\"): ")
+        input_file_name = input("Inserisci il nome del file steganografato (es. fname_stego.docx) presente nella directory \"stego\": ")
 
         # Check existence of input file
         path_input_file = "./stego/" + input_file_name
