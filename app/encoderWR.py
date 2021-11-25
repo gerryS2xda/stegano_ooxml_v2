@@ -183,12 +183,12 @@ def encoding(message, password, path_file_extracted):
             count = len(txt_element_tag.text)
             total_counter_characters += count
 
-            # Se il run element corrente non contiene tag <rPr>, si crea e aggiunge tale tag
+            # Se il run element corrente non contiene tag <w:rPr>, si crea e aggiunge tale tag
             if run_elements[i_run_elements - 1].find("./" + RUN_ELEM_PROPERTY_TAG) == None:
                 rpr = etree.Element(RUN_ELEM_PROPERTY_TAG)
                 rpr.append(etree.Element(SZCS_TAG))
                 rpr.find("./" + SZCS_TAG).set(PREFIX_WORD_PROC + "val", szcs_val_prec.__str__())
-                run_elements[i_run_elements - 1].append(rpr)
+                run_elements[i_run_elements - 1].insert(0, rpr) # aggiungi tag <w:rPr> prima del testo (necessario altrimenti non vengono applicate le proprietà)
             # Altrimenti, se non contiene il tag <szCS> lo aggiungo al run element corrente
             elif run_elements[i_run_elements - 1].find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG) == None:
                     run_elements[i_run_elements - 1].find("./" + RUN_ELEM_PROPERTY_TAG).append(etree.Element(SZCS_TAG))

@@ -221,7 +221,7 @@ def encoding(message, password, path_file_extracted):
                     if run_elements[index_run_element-1].find("./" + RUN_ELEMENT_PROPERTY_TAG) == None:
                         rpr = etree.Element(RUN_ELEMENT_PROPERTY_TAG)
                         rpr.set(RPR_ATTRIBUTE_FOR_MARKER_SPLIT, bmk_attr_val_prec.__str__()) #aggiungi attributo "bmk"
-                        run_elements[index_run_element-1].append(rpr)
+                        run_elements[index_run_element-1].insert(0, rpr) # aggiungi tag <a:rPr> prima del testo (necessario altrimenti non vengono applicate le proprietà)
                     # Altrimenti, se non contiene l'attributo "RPR_ATTRIBUTE_FOR_MARKER_SPLIT", aggiungilo a <a:rPr>
                     elif run_elements[index_run_element-1].find("./" + RUN_ELEMENT_PROPERTY_TAG).get(RPR_ATTRIBUTE_FOR_MARKER_SPLIT) == None:
                         run_elements[index_run_element-1].find("./" + RUN_ELEMENT_PROPERTY_TAG).set(RPR_ATTRIBUTE_FOR_MARKER_SPLIT, bmk_attr_val_prec.__str__()) #aggiungi attributo "bmk"

@@ -175,7 +175,7 @@ def encoding(message, password, path_file_extracted):
             charset_tag.set("val", charset_val.__str__())
             rpr = etree.Element(RUN_ELEMENT_PROPERTY_TAG)
             rpr.append(charset_tag)
-            run_element.append(rpr)
+            run_element.insert(0, rpr) # aggiungi tag <rPr> in prima posizione prima di altri tag altrimenti non vengono applicate le proprietà
             run_element.append(text_tag_si)
             si.append(run_element)
 
@@ -206,7 +206,7 @@ def encoding(message, password, path_file_extracted):
                 rpr = etree.Element(RUN_ELEMENT_PROPERTY_TAG)
                 rpr.append(etree.Element(CHARSET_TAG))
                 rpr.find("./" + CHARSET_TAG).set("val", charset_val.__str__())
-                run_elements[index_run_element - 1].append(rpr)
+                run_elements[index_run_element - 1].insert(0, rpr) # aggiungi tag <rPr> prima del testo
             # Altrimenti, se non contiene il tag <charset> usato come marker di split -> aggiungilo a <rPr>
             elif run_elements[index_run_element - 1].find("./" + RUN_ELEMENT_PROPERTY_TAG + "/" + CHARSET_TAG) == None:
                     run_elements[index_run_element - 1].find("./" + RUN_ELEMENT_PROPERTY_TAG).append(etree.Element(CHARSET_TAG))
