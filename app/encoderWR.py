@@ -17,6 +17,7 @@ VANISH_ELEM_TAG = PREFIX_WORD_PROC + "vanish"
 BODY_TAG = PREFIX_WORD_PROC + "body"
 TEXT_TAG = PREFIX_WORD_PROC + "t"
 SZCS_TAG = PREFIX_WORD_PROC + "szCs"
+BREAK_TAG = PREFIX_WORD_PROC + "br"
 
 # Computa un valore casuale da assegnare escludendo quello che viene passato in input
 def random_num_except(except_num):
@@ -206,6 +207,11 @@ def encoding(message, password, path_file_extracted):
                     tag_element = paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]" + "/" + TEXT_TAG)
                     text = tag_element.text
                     new_run_elem = copy.copy(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]"))
+
+                    # Rimuovi il tag <w:br> (Break) dal nuovo "run" se presente per evitare alterazione del testo
+                    if new_run_elem.find("./" + BREAK_TAG) != None:
+                        new_run_elem.remove(new_run_elem.find("./" + BREAK_TAG))
+
                     # step 10 -> Modify the splitting mark <w:szCs> in the run elements alternatively.
                     if new_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG) != None:
                         new_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG).set(PREFIX_WORD_PROC + "val",random_num_except(szcs_val_prec).__str__())
