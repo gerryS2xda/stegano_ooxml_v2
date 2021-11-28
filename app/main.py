@@ -1,7 +1,6 @@
 import os
-import shutil
-from zipfile import ZipFile
 import sys
+import time
 from app import encoderWR
 from app import encoderPP
 from app import encoderEX
@@ -39,6 +38,9 @@ if __name__ == '__main__':
         # Insert passphrase to generate symmectric key for encrypt
         password = input("Inserisci password per la cifratura del testo: ")
 
+        # Init start execution time
+        start_time = time.time()
+
         # Select type of encoding by type of input file (i.e. fname.docx -> use encoder for docx)
         path_file_extracted = path_working_directory + "/" + input_file_name + "/file_extracted"
         if input_file_extension == ".docx":
@@ -50,6 +52,11 @@ if __name__ == '__main__':
         elif input_file_extension == ".xlsx":
             print("Esecuzione text split method per una cartella di fogli di lavoro Excel...")
             encoderEX.encoding(message, password, path_file_extracted)
+
+        # Stop execution time and print
+        execution_time = time.time() - start_time
+        print("Tempo di esecuzione dell'encoder: " + execution_time.__str__() + " secondi")
+
         # Remove input file folder with extracted file from "working_directory"
         utils.remove_directory(path_working_directory + "/" + input_file_name)
     elif mode == "2":
@@ -74,6 +81,9 @@ if __name__ == '__main__':
         # Insert passphrase to generate symmectric key for decrypt
         password = input("Inserisci password per decifrare il testo segreto: ")
 
+        # Init start execution time
+        start_time = time.time()
+
         # Select type of encoding by type of input file (i.e. fname.docx -> use encoder for docx)
         path_file_extracted = path_working_directory + "/" + input_file_name + "/file_extracted"
         if input_file_extension == ".docx":
@@ -85,6 +95,11 @@ if __name__ == '__main__':
         elif input_file_extension == ".xlsx":
             print("Esecuzione text split method per per estrazione di un testo segreto da cartella di fogli di lavoro Excel...")
             decoderEX.decoding(password, path_file_extracted)
+
+        # Stop execution time and print
+        execution_time = time.time() - start_time
+        print("Tempo di esecuzione del decoder: " + execution_time.__str__() + " secondi")
+
         # Remove input file folder with extracted file from "working_directory"
         utils.remove_directory(path_working_directory + "/" + input_file_name)
     else:
