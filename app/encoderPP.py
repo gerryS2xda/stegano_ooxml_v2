@@ -117,13 +117,6 @@ def check_if_available_space(index, paragraph, information_to_encode_bits, offse
         return False
     return True
 
-# Stampa le statistiche in merito a caratteri totali del contenuto testuale, caratteri usati per inclusione, numero di bit testo segreto e quante volte è stato iniettato
-def printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text):
-    print("Capacità totale (# caratteri contenuto testuale): " + total_counter_characters.__str__())
-    print("Capacità di inclusione (# caratteri usati): " + total_counter_inclusion.__str__())
-    print("Numero minimo di bits da iniettare per testo segreto: " + len(information_to_encode_bits).__str__())
-    print("Numero di volte in cui il testo segreto è stato iniettato: " + total_complete_repeat_segret_text.__str__())
-
 # Crea il file "slideX.xml" steganografato e aggiungilo in "stego/file_extracted"
 def createSlideStego(tree, slide_filename):
     tree.write("stego/" + slide_filename)
@@ -162,6 +155,8 @@ def encoding(message, password, path_file_extracted):
     total_counter_characters = 0
     total_counter_inclusion = 0
     i = 0
+    count_txt_tag_base = 0  # for testing
+    count_txt_tag = 0  # for testing
 
     # Inizializza il file .pptx steganografato copiando il contenuto originale in "stego/file_extracted"
     if os.path.exists("stego/file_extracted"):
@@ -201,6 +196,7 @@ def encoding(message, password, path_file_extracted):
                     txt_tag = run_element.find("./" + TEXT_ELEMENT_TAG)
                     #Se il run element ha un "text element" allora lo puoi estrarre
                     if txt_tag != None:
+                        count_txt_tag_base += 1
                         run_elements.append(run_element)
 
                 index_run_element = 1
@@ -253,6 +249,7 @@ def encoding(message, password, path_file_extracted):
                                 new_run_element.find("./" + TEXT_ELEMENT_TAG).text = " "
                             # optimization -> remove tree.write("stego/document.xml")
                             N = 1
+                            count_txt_tag += 1
                         i += 1
                         count -= 1
                         # Step 13 -> Ritorna allo step 11 finché C è >= 1
@@ -273,10 +270,12 @@ def encoding(message, password, path_file_extracted):
         utils.remove_directory(os.path.split(path_file_extracted)[0])
         sys.exit("Non è stato possibile iniettare il testo segreto poichè presenta un numero di bits maggiori della capacità di inclusione!!\nFine!")
 
-    # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
-    printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text)
+    # Stampa le statistiche in merito al numero di parole, inclusioni, bit da codificare e altro per il testing
+    utils.printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text)
+    count_txt_tag += count_txt_tag_base
+    print("directory \"slides\" statistics: <a:t> di base: " + count_txt_tag_base.__str__() + "; dopo: " + count_txt_tag.__str__())
 
-    #Crea il file ".pptx" contenente il testo segreto
+    # Crea il file ".pptx" contenente il testo segreto
     createFileStego(path_file_extracted)
     print("Il file .pptx steganografato è stato salvato nella directory \"stego\"")
 

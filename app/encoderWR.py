@@ -110,13 +110,6 @@ def check_if_available_space(index,paragraph,information_to_encode_bits,offset_r
         return False
     return True
 
-# Stampa le statistiche in merito a caratteri totali del contenuto testuale, caratteri usati per inclusione, numero di bit testo segreto e quante volte è stato iniettato
-def printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text):
-    print("Capacità totale (# caratteri contenuto testuale): " + total_counter_characters.__str__())
-    print("Capacità di inclusione (# caratteri usati): " + total_counter_inclusion.__str__())
-    print("Numero minimo di bits da iniettare per testo segreto: " + len(information_to_encode_bits).__str__())
-    print("Numero di volte in cui il testo segreto è stato iniettato: " + total_complete_repeat_segret_text.__str__())
-
 # Crea il file ".docx" contenente "document.xml" steganografato
 def createFileStego(tree, path_file_extracted):
     input_file_name = os.path.splitext(os.path.split(os.path.split(path_file_extracted)[0])[1])[0] # no estensione file
@@ -156,8 +149,11 @@ def encoding(message, password, path_file_extracted):
     total_counter_characters = 0
     total_counter_inclusion = 0
     print("INIEZIONE IN CORSO .....")
+
     paragraphs = root.findall("./" + BODY_TAG + "/" + PARAGRAPH_TAG)
     i = 0
+    count_txt_tag_base = 0  # for testing
+    count_txt_tag = 0  # for testing
     # Step 4 -> Estrai tutti i paragrafi <w:p> presenti in P
     for paragraph in paragraphs:
         # step 5 -> IF (2 o più elementi <w:r> consecutivi in P hanno gli stessi attributi) THEN unisci gli elementi consecutivi <w:r>.;
@@ -167,6 +163,7 @@ def encoding(message, password, path_file_extracted):
         run_elements = []
         for node in paragraph.findall("./" + RUN_ELEMENT_TAG):
             if node.find("./" +  TEXT_TAG) != None:
+                count_txt_tag_base += 1
                 run_elements.append(node)
         i_run_elements = 1
         offset_run_elem = 1
@@ -232,6 +229,7 @@ def encoding(message, password, path_file_extracted):
                         new_run_elem.find("./" + TEXT_TAG).text = " "
                     # optimization -> remove tree.write("stego/document.xml")
                     N = 1
+                    count_txt_tag += 1
                 i += 1
                 count -= 1
                 # step 11 -> Ritorna allo step 9 fino a quando C >= 1;
@@ -247,8 +245,10 @@ def encoding(message, password, path_file_extracted):
         utils.remove_directory(os.path.split(path_file_extracted)[0])
         sys.exit("Non è stato possibile iniettare il testo segreto poichè presenta un numero di bits maggiori della capacità di inclusione!!\nFine!")
 
-    # Stampa le statistiche in merito al numero di parole, inclusioni e bit da codificare
-    printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text)
+    # Stampa le statistiche in merito al numero di parole, inclusioni, bit da codificare e altro per il testing
+    utils.printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text)
+    count_txt_tag += count_txt_tag_base
+    print("document.xml statistics: <w:t> di base: " + count_txt_tag_base.__str__() + "; dopo: " + count_txt_tag.__str__())
 
     # Crea il file steganografato
     createFileStego(tree, path_file_extracted)
