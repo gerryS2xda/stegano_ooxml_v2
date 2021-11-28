@@ -34,6 +34,17 @@ def principal_period(s):
     i = (s+s).find(s, 1, -1)
     return None if i == -1 else s[:i]
 
+# Statistics (for testing)
+# Stampa le statistiche in merito a caratteri totali del contenuto testuale, caratteri usati per inclusione, numero di bit testo segreto e quante volte è stato iniettato
+def printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text):
+    print("Capacità totale (# caratteri contenuto testuale): " + total_counter_characters.__str__())
+    print("Capacità di inclusione (# caratteri usati): " + total_counter_inclusion.__str__())
+    bit_rate = total_counter_inclusion / total_counter_characters
+    print("Bit rate: " + bit_rate.__str__())
+    print("Numero minimo di bits da iniettare per testo segreto: " + len(information_to_encode_bits).__str__())
+    print("Numero di volte in cui il testo segreto è stato iniettato: " + total_complete_repeat_segret_text.__str__())
+
+
 # Files and directory utils
 # Verifica se il file posto in input è un file MS-Office (.docx, .pptx, .xlsx)
 def check_correct_extension_inputfile(input_file_extension):
