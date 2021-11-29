@@ -38,7 +38,7 @@ def merge_possible_run_elements(paragraph):
         mismatch = False
         j = i + 1
         #check sul numero degli elementi. Se non hanno lo stesso numero di elementi -> no merge
-        if  j < len(run_property_elements) and len(run_property_elements[i]) !=  len(run_property_elements[j]):
+        if j < len(run_property_elements) and len(run_property_elements[i]) != len(run_property_elements[j]):
             continue
 
         while mismatch != True and j < len(run_property_elements):
@@ -53,9 +53,11 @@ def merge_possible_run_elements(paragraph):
                 while x < j:
                     #append  node i + 1 to base node
                     node = paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (x + 1).__str__() + "]" + "/" + TEXT_TAG)
-                    if node == None:
+                    if node == None: # se il nodo i + 1 non ha il text element, esci dal ciclo
                         break
-                    base_node =  paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (i + 1).__str__() + "]" + "/" + TEXT_TAG)
+                    base_node = paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (i + 1).__str__() + "]" + "/" + TEXT_TAG)
+                    if base_node == None: # se il base_node non ha il text element, esci dal ciclo
+                        break
                     base_node.text = base_node.text + node.text
                     x += 1
                 x = i + 1

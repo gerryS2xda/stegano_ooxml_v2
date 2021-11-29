@@ -51,9 +51,11 @@ def merge_possible_run_elements(string_item):
                 while x < j:
                     #append node i + 1 to base node
                     node = string_item.find("./" + RUN_ELEMENT_TAG + "[" + (x + 1).__str__() + "]" + "/" + TEXT_TAG)
-                    if node == None:
+                    if node == None: # se il base_node non ha il text element, esci dal ciclo
                         break
                     base_node = string_item.find("./" + RUN_ELEMENT_TAG + "[" + (i + 1).__str__() + "]" + "/" + TEXT_TAG)
+                    if base_node == None: # se il base_node non ha il text element, esci dal ciclo
+                        break
                     base_node.text = base_node.text + node.text
                     x += 1
                 x = i + 1
