@@ -42,11 +42,16 @@ def decoding(password, path_file_extracted):
             # Step 5 -> Estrai paragrafo <a:p> in P
             paragraphs = txBody.findall("./" + PARAGRAPH_TAG)
             for paragraph in paragraphs:
-                # Step 6 -> Estrai un elemento run <a:r> in R e l'elemento di testo <a:t> dell’elemento R in T.
+                # Step 6 -> Estrai un elemento run <a:r> in R e considera solo quelli con il text element <a:t> ponendoli in T.
                 run_elements = paragraph.findall("./" + RUN_ELEMENT_TAG)
+
                 i_run_elements = 0
                 while i_run_elements < len(run_elements):
                     curr_run_elem = run_elements[i_run_elements]
+                    if curr_run_elem.find("./" + TEXT_ELEMENT_TAG) == None:  # estrai soltanto quei run che hanno un text element
+                        i_run_elements += 1
+                        continue
+
                     mismatch = False
                     bmk_attr_rPr_tag = curr_run_elem.find("./" + RUN_ELEMENT_PROPERTY_TAG).get(RPR_ATTRIBUTE_FOR_MARKER_SPLIT)
                     if ((i_run_elements + 1) < len(run_elements)) and (bmk_attr_rPr_tag != None) and (bmk_attr_rPr_tag != "0"):

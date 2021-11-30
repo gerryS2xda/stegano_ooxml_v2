@@ -42,7 +42,7 @@ def merge_possible_run_elements(paragraph):
         mismatch = False
         j = i + 1
         #check sul numero degli attributi ed elementi. Se non hanno lo stesso numero di attributi o di elementi -> no merge
-        if  j < len(run_property_elements) and \
+        if j < len(run_property_elements) and \
                 ((len(run_property_elements[i].keys()) !=  len(run_property_elements[j].keys())) or (len(run_property_elements[i]) !=  len(run_property_elements[j]))):
             continue
         
@@ -156,7 +156,7 @@ def encoding(message, password, path_file_extracted):
     # Inizializzazione di un contatore di caratteri e di caratteri usati per inclusione
     total_counter_characters = 0
     total_counter_inclusion = 0
-    i = 0
+    i = 0 # conta i caratteri usati per l'incapsulamento dei bit
     count_txt_tag_base = 0  # for testing
     count_txt_tag = 0  # for testing
 
@@ -193,18 +193,21 @@ def encoding(message, password, path_file_extracted):
                 merge_possible_run_elements(paragraph)
 
                 # Step 9 -> Estrai elemento <a:r> in R e i relativi <a:t> (text element) in T
-                run_elements = []
-                for run_element in paragraph.findall("./" + RUN_ELEMENT_TAG):
-                    txt_tag = run_element.find("./" + TEXT_ELEMENT_TAG)
-                    #Se il run element ha un "text element" allora lo puoi estrarre
-                    if txt_tag != None:
-                        count_txt_tag_base += 1
-                        run_elements.append(run_element)
+                run_elements = paragraph.findall("./" + RUN_ELEMENT_TAG)
 
+                # Inizializzazione contatori per tenere traccia dei run
                 index_run_element = 1
-                offset_run_element = 1
+                offset_run_element = 1  # run da saltare rispetto a quelli di base correnti
+
                 bmk_attr_val_prec = 0
                 while index_run_element <= len(run_elements):
+                    # Considera solo <a:r> con text element
+                    if run_elements[index_run_element-1].find("./" + TEXT_ELEMENT_TAG):
+                        index_run_element += 1
+                        offset_run_element += 1
+                        continue
+                    count_txt_tag_base += 1
+
                     # Computa valore da assegnare all'attributo "bmk" di <a:rPr> usato come marker split
                     bmk_attr_val_prec = random_num_except(bmk_attr_val_prec)
 

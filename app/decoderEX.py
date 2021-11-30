@@ -21,11 +21,16 @@ def decoding(password, path_file_extracted):
     string_items = root.findall("./" + STRING_ITEM_TAG)
     i = 0
     for si in string_items:
-        # Step 3 -> Estrai un elemento run <r>⋯ </r> in R e l'elemento di testo <t>⋯ </t> dell’elemento R in T.
+        # Step 3 -> Estrai un elemento run <r>⋯ </r> in R e considera solo quelli con il text element <t> ponendoli in T.
         run_elements = si.findall("./" + RUN_ELEMENT_TAG)
+
         i_run_elements = 0
         while i_run_elements < len(run_elements):
             curr_run_elem = run_elements[i_run_elements]
+            if curr_run_elem.find("./" + TEXT_TAG) == None:  # estrai soltanto quei run che hanno un text element
+                i_run_elements += 1
+                continue
+
             mismatch = False
             charset_tag = curr_run_elem.find("./" + RUN_ELEMENT_PROPERTY_TAG + "/" + CHARSET_TAG)
             if ((i_run_elements + 1) < len(run_elements)) and (charset_tag != None) and (charset_tag.get("val") != "0"): # nella codifica si considera solo i charset con "val" diverso da 0

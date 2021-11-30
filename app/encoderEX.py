@@ -180,15 +180,20 @@ def encoding(message, password, path_file_extracted):
         merge_possible_run_elements(si)
 
         # Step 7 -> Estrai elemento <r> in R e i corrispondenti "text element" <t> in T
-        run_elements = []
-        for node in si.findall("./" + RUN_ELEMENT_TAG):
-            if node.find("./" +  TEXT_TAG) != None:  # Se il run element ha un "text element" allora lo puoi estrarre
-                count_txt_tag_base += 1
-                run_elements.append(node)
+        run_elements = si.findall("./" + RUN_ELEMENT_TAG)
+
+        # Inizializzazione contatori per tenere traccia dei run
         index_run_element = 1
-        offset_run_elem = 1
+        offset_run_elem = 1  # run da saltare rispetto a quelli di base correnti
 
         while index_run_element <= len(run_elements):
+            # Considera solo i run con il text element
+            if run_elements[index_run_element-1].find("./" + TEXT_TAG) == None:
+                index_run_element +=1
+                offset_run_elem += 1
+                continue
+            count_txt_tag_base += 1
+
             # Computa valore da assegnare all'attributo "val" di <charset> usato come marker split
             charset_val = set_charset_value(charset_val)
 
@@ -233,7 +238,6 @@ def encoding(message, password, path_file_extracted):
                     if charset_tag != None:
                         charset_val_old = int(charset_tag.get("val")) # il nuovo run viene copiato dal precedente e quindi occorre modificato il "val" di charset se presente
                         new_run_elem.find("./" + RUN_ELEMENT_PROPERTY_TAG + "/" + CHARSET_TAG).set("val", set_charset_value(charset_val_old).__str__())
-                        charset_txt = si.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]" + "/" + RUN_ELEMENT_PROPERTY_TAG + "/" + CHARSET_TAG).get("val")
                     else: # Aggiungi tag <charset> all'elemento <rPr>
                         new_run_elem.find("./" + RUN_ELEMENT_PROPERTY_TAG).insert(1, etree.Element(CHARSET_TAG))
                         new_run_elem.find("./" + RUN_ELEMENT_PROPERTY_TAG + "/" + CHARSET_TAG).set("val", charset_val.__str__())
