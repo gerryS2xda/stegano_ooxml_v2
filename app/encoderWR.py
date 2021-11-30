@@ -43,7 +43,7 @@ def merge_possible_run_elements(paragraph):
 
         while mismatch != True and j < len(run_property_elements):
             for child_of_node in node:
-                child_of_node_j = run_property_elements[j].find("./"  + child_of_node.tag)
+                child_of_node_j = run_property_elements[j].find("./" + child_of_node.tag)
                 if child_of_node_j == None or (child_of_node.tag != SZCS_TAG and (len(child_of_node_j.keys()) != len(child_of_node.keys()))):
                     mismatch = True
                     break
@@ -150,28 +150,33 @@ def encoding(message, password, path_file_extracted):
     # Inizializzazione di un contatore di caratteri e di inclusione
     total_counter_characters = 0
     total_counter_inclusion = 0
-    print("INIEZIONE IN CORSO .....")
-
-    paragraphs = root.findall("./" + BODY_TAG + "/" + PARAGRAPH_TAG)
-    i = 0
+    i = 0  # conta i caratteri usati per l'incapsulamento dei bit
     count_txt_tag_base = 0  # for testing
     count_txt_tag = 0  # for testing
+
+    print("INIEZIONE IN CORSO .....")
+    paragraphs = root.findall("./" + BODY_TAG + "/" + PARAGRAPH_TAG)
     # Step 4 -> Estrai tutti i paragrafi <w:p> presenti in P
     for paragraph in paragraphs:
         # step 5 -> IF (2 o più elementi <w:r> consecutivi in P hanno gli stessi attributi) THEN unisci gli elementi consecutivi <w:r>.;
         merge_possible_run_elements(paragraph)
 
-        # Step 6 -> Estrai elemento <w:r> in R e i corrispondenti "text element" <w:t> in T
-        run_elements = []
-        for node in paragraph.findall("./" + RUN_ELEMENT_TAG):
-            if node.find("./" +  TEXT_TAG) != None:
-                count_txt_tag_base += 1
-                run_elements.append(node)
+        # Step 6 -> Estrai tutti gli elementi <w:r> in R e poi considera solo quelli con il text element
+        run_elements = paragraph.findall("./" + RUN_ELEMENT_TAG)
+
+        # Inizializzazione contatori per tenere traccia dei run
         i_run_elements = 1
-        offset_run_elem = 1
+        offset_run_elem = 1  # run da saltare rispetto a quelli di base correnti
 
         szcs_val_prec = 0
         while i_run_elements <= len(run_elements):
+            # Considera solo <w:r> con text element
+            if run_elements[i_run_elements-1].find("./" +  TEXT_TAG) == None:
+                i_run_elements += 1
+                offset_run_elem += 1
+                continue
+            count_txt_tag_base +=1
+
             # Computa valore da assegnare all'attributo "w:val" di <szCs> usato come marker split
             szcs_val_prec = random_num_except(szcs_val_prec)
 
@@ -197,6 +202,7 @@ def encoding(message, password, path_file_extracted):
                 # Check if enough space to inject information coded remain
                 if(check_if_available_space(i,paragraph,information_to_encode_bits,offset_run_elem,count) == False):
                     break
+
                 # Step 9 -> Leggi un bit da "information_to_encode_bits" in modo circolare e decrementa "count"
                 # Caso a) Se il bit è 0, allora incrementa N
                 if(information_to_encode_bits[i % len(information_to_encode_bits)]) == "0":
@@ -208,7 +214,7 @@ def encoding(message, password, path_file_extracted):
                     new_run_elem = copy.copy(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]"))
 
                     # Rimuovi il tag <w:br> (Break) dal nuovo "run" se presente per evitare alterazione del testo
-                    if new_run_elem.find("./" + BREAK_TAG) != None:
+                    if new_run_elem.find("./" + BREAK_TAG) != None: # (da gestire in fase di decodifica)
                         new_run_elem.remove(new_run_elem.find("./" + BREAK_TAG))
 
                     # step 10 -> Modify the splitting mark <w:szCs> in the run elements alternatively.
@@ -223,7 +229,7 @@ def encoding(message, password, path_file_extracted):
                     new_run_elem.find("./" + TEXT_TAG).text = text[N:]
                     # Aggiungo space preserve
                     tag_element.set("{http://www.w3.org/XML/1998/namespace}space","preserve")
-                    new_run_elem.find("./" + TEXT_TAG).set("{http://www.w3.org/XML/1998/namespace}space","preserve")
+                    new_run_elem.find("./" + TEXT_TAG).set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
                     paragraph.insert(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]").getparent().index(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]")) + 1, new_run_elem)
                     offset_run_elem += 1
                     if len(text[N:]) == 0 and new_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + VANISH_ELEM_TAG) == None:

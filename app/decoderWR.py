@@ -19,12 +19,18 @@ def decoding(password, path_file_extracted):
 
     # Step 2 -> Estrai un paragrafo <w:p> in P alla volta
     paragraphs = root.findall("./" + BODY_TAG + "/" + PARAGRAPH_TAG)
+    count_r = 0
     for paragraph in paragraphs:
-        # Step 3 -> Estrai un elemento run <w:r>⋯ </w:r> in R e l'elemento di testo <w:t>⋯ </w:t> dell’elemento R in T.
+        # Step 3 -> Estrai tutti i run <w:r>⋯ </w:r> in R e considera solo quelli con il text element <w:t> ponendoli in T.
         run_elements = paragraph.findall("./" + RUN_ELEMENT_TAG)
+
         i_run_elements = 0
         while i_run_elements < len(run_elements):
             curr_run_elem = run_elements[i_run_elements]
+            if curr_run_elem.find("./" + TEXT_TAG) == None:  # estrai soltanto quei run che hanno un text element
+                i_run_elements += 1
+                continue
+
             mismatch = False
             if i_run_elements + 1 < len(run_elements) and curr_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG) != None and curr_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG).get(PREFIX_WORD_PROC + "val") != "0":
                 next_run_elem = run_elements[i_run_elements + 1]
@@ -35,7 +41,7 @@ def decoding(password, path_file_extracted):
                     for child_curr_property_elem in curr_property_elements:
                         child_next_property_elem = next_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + child_curr_property_elem.tag)
                         # mismatch
-                        if child_next_property_elem == None  or (child_curr_property_elem.tag != SZCS_TAG and (len(child_next_property_elem.keys()) != len(child_curr_property_elem.keys()))):
+                        if child_next_property_elem == None or (child_curr_property_elem.tag != SZCS_TAG and (len(child_next_property_elem.keys()) != len(child_curr_property_elem.keys()))):
                             mismatch = True
                             break
                 # case (A) -> if they have same attributes except the splitting mark, record the number of characters in the current text element to K, and add K-1 "0" to M (message) and "1" at the end
@@ -47,7 +53,6 @@ def decoding(password, path_file_extracted):
                 elif curr_run_elem.find("./" + TEXT_TAG).text != None:
                     text_tag = curr_run_elem.find("./" + TEXT_TAG).text
                     message += ("0" * (len(text_tag) - 1))
-
             # Step 6 -> Ripeti dallo step 3 allo step 5 finché tutti gli elementi <r> in P non sono stati risolti
             i_run_elements += 1
         # Step 7 -> Ripeti dallo step 2 allo step 6 finché tutti i paragrafi in P non sono stati risolti
