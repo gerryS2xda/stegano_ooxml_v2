@@ -31,71 +31,74 @@ def random_num_except(except_num):
 
 # Merge di tutti i possibili "run element" che presentano le stesse caratteristiche (numero attributi e elementi XML figli)
 def merge_possible_run_elements(paragraph):
-    #Cerca gli "run element property" (<a:rPr>) nel paragrafo e memorizzali in un array
+    # Cerca gli "run element property" (<a:rPr>) nel paragrafo e memorizzali in un array
     run_property_elements = []
     for node in paragraph.findall("./" + RUN_ELEMENT_TAG + "/" + RUN_ELEMENT_PROPERTY_TAG):
         if node.getparent().find("./" + TEXT_ELEMENT_TAG) != None:
             run_property_elements.append(node)
-            
+
     i = 0
     for node in run_property_elements:
         mismatch = False
         j = i + 1
-        #check sul numero degli attributi ed elementi. Se non hanno lo stesso numero di attributi o di elementi -> no merge
+        # check sul numero degli attributi ed elementi. Se non hanno lo stesso numero di attributi o di elementi -> no merge
         if j < len(run_property_elements) and \
-                ((len(run_property_elements[i].keys()) !=  len(run_property_elements[j].keys())) or (len(run_property_elements[i]) !=  len(run_property_elements[j]))):
+                ((len(run_property_elements[i].keys()) != len(run_property_elements[j].keys())) or (
+                        len(run_property_elements[i]) != len(run_property_elements[j]))):
             continue
-        
-        #Merge dei possibili "Run element" sulla base degli elementi presenti in ciascun <a:rPr>
+
+        # Merge dei possibili "Run element" sulla base degli elementi presenti in ciascun <a:rPr>
         while mismatch != True and j < len(run_property_elements):
-            #Verifica che se "node i" ha gli stessi attributi di "node j", controlla se anche gli elementi al suo interno hanno le stesse caratteristiche
+            # Verifica che se "node i" ha gli stessi attributi di "node j", controlla se anche gli elementi al suo interno hanno le stesse caratteristiche
             if len(node.keys()) == len(run_property_elements[j].keys()):
-                for child_of_node in node: #per ogni tag figlio presente in <a:rPr>
-                    child_of_node_j = run_property_elements[j].find("./"  + child_of_node.tag)
+                for child_of_node in node:  # per ogni tag figlio presente in <a:rPr>
+                    child_of_node_j = run_property_elements[j].find("./" + child_of_node.tag)
                     if child_of_node_j == None or (len(child_of_node_j.keys()) != len(child_of_node.keys())):
                         mismatch = True
                         break
-            else: 
+            else:
                 mismatch = True
-            
-            #merge nodi fino al j - 1 elemento
-            if mismatch == True: #Se si è verificato un mismatch, fai il merge fino a questo punto
+
+            # merge nodi fino al j - 1 elemento
+            if mismatch == True:  # Se si è verificato un mismatch, fai il merge fino a questo punto
                 x = i + 1
                 while x < j:
-                    #append "node i + 1" to "base node"
-                    node = paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (x + 1).__str__() + "]" + "/" + TEXT_ELEMENT_TAG)
-                    if node == None: # se il nodo i + 1 non ha il text element, esci dal ciclo
+                    # append "node i + 1" to "base node"
+                    node = paragraph.find(
+                        "./" + RUN_ELEMENT_TAG + "[" + (x + 1).__str__() + "]" + "/" + TEXT_ELEMENT_TAG)
+                    if node == None:  # se il nodo i + 1 non ha il text element, esci dal ciclo
                         break
-                    base_node = paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (i + 1).__str__() + "]" + "/" + TEXT_ELEMENT_TAG)
-                    if base_node == None: # se il base_node non ha il text element, esci dal ciclo
+                    base_node = paragraph.find(
+                        "./" + RUN_ELEMENT_TAG + "[" + (i + 1).__str__() + "]" + "/" + TEXT_ELEMENT_TAG)
+                    if base_node == None:  # se il base_node non ha il text element, esci dal ciclo
                         break
                     base_node.text = base_node.text + node.text
                     x += 1
                 x = i + 1
                 while x < j:
-                    #rimuovo elemento successivo al nodo merge
+                    # rimuovo elemento successivo al nodo merge
                     run_property_elements.remove(run_property_elements[i + 1])
                     paragraph.remove(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (i + 2).__str__() + "]"))
                     x += 1
-            #se sono arrivato alla fine dei nodi del paragrafo --> tutti i nodi hanno gli stessi attributi
+            # se sono arrivato alla fine dei nodi del paragrafo --> tutti i nodi hanno gli stessi attributi
             elif (j == len(run_property_elements) - 1):
                 x = i + 1
                 while x <= j:
-                    #append  node i + 1 to base node
+                    # append  node i + 1 to base node
                     node = paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (x + 1).__str__() + "]" + "/" + TEXT_ELEMENT_TAG)
                     if node == None:
                         break
-                    #NEW DA TESTARE COMPLETO
+                    # NEW DA TESTARE COMPLETO
                     if paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (i + 1).__str__() + "]" + "/" + TEXT_ELEMENT_TAG) == None:
                         paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (i + 1).__str__() + "]").append(etree.Element(TEXT_ELEMENT_TAG))
                         paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (i + 1).__str__() + "]" + "/" + TEXT_ELEMENT_TAG).text = node.text
                     else:
-                        base_node =  paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (i + 1).__str__() + "]" + "/" + TEXT_ELEMENT_TAG)
+                        base_node = paragraph.find( "./" + RUN_ELEMENT_TAG + "[" + (i + 1).__str__() + "]" + "/" + TEXT_ELEMENT_TAG)
                         base_node.text = base_node.text + node.text
                     x += 1
                 x = i + 1
                 while x <= j:
-                    #rimuovo elemento successivo al nodo merge
+                    # rimuovo elemento successivo al nodo merge
                     run_property_elements.remove(run_property_elements[i + 1])
                     paragraph.remove(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (i + 2).__str__() + "]"))
                     x += 1
@@ -148,6 +151,7 @@ def createFileStego(path_file_extracted):
 def encoding(message, password, path_file_extracted):
     # Step 1 -> Cifra il testo segreto H mediante l’algoritmo AES-CBC, usando la chiave simmetrica
     encrypted = utils.encrypt(password, message)
+    print(encrypted)
 
     # Step 2 -> Aggiungi alla fine del testo cifrato il carattere di divisione "%".
     information_to_encode_bits = utils.text_to_binary(encrypted.decode("utf-8")) + utils.text_to_binary(
@@ -172,7 +176,7 @@ def encoding(message, password, path_file_extracted):
             slides.remove(slide)
 
     for slide in slides:
-        print("INIEZIONE IN CORSO in " + slide + "...")
+        #print("INIEZIONE IN CORSO in " + slide + "...")
 
         # Step 4 -> Leggi il codice dal file "slides/slideX.xml"
         tree = etree.parse(path_file_extracted + "/ppt/slides/" + slide)
@@ -202,7 +206,7 @@ def encoding(message, password, path_file_extracted):
                 bmk_attr_val_prec = 0
                 while index_run_element <= len(run_elements):
                     # Considera solo <a:r> con text element
-                    if run_elements[index_run_element-1].find("./" + TEXT_ELEMENT_TAG):
+                    if run_elements[index_run_element-1].find("./" + TEXT_ELEMENT_TAG) == None:
                         index_run_element += 1
                         offset_run_element += 1
                         continue
@@ -250,8 +254,8 @@ def encoding(message, password, path_file_extracted):
                             new_run_element.find("./" + TEXT_ELEMENT_TAG).text = text[N:]
                             paragraph.insert(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_element).__str__() + "]").getparent().index(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_element).__str__() + "]")) + 1, new_run_element)
                             offset_run_element += 1
-                            if len(text[N:]) == 0: # necessario altrimenti crea un text element vuoto (<a:t/>) che viene rimosso quando si salva il file
-                                new_run_element.find("./" + TEXT_ELEMENT_TAG).text = " "
+                            if len(text[N:]) == 0:  # anche se <a:t> è vuoto, il decoder lo ignora dall'estrazione
+                                new_run_element.find("./" + TEXT_ELEMENT_TAG).text = ""
                             # optimization -> remove tree.write("stego/document.xml")
                             N = 1
                             count_txt_tag += 1

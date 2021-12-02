@@ -252,8 +252,8 @@ def encoding(message, password, path_file_extracted):
                     # Aggiungi un nuovo <r> e setta il tag <t>
                     si.insert(si.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]").getparent().index(si.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]")) + 1, new_run_elem)
                     offset_run_elem += 1
-                    if len(text[N:]) == 0: # Necessario altrimenti crea un text element vuoto (<t/>) che viene rimosso quando si salva il file
-                        new_run_elem.find("./" + TEXT_TAG).text = " "
+                    if len(text[N:]) == 0: # anche se <t> è vuoto, il decoder lo ignora dall'estrazione
+                        new_run_elem.find("./" + TEXT_TAG).text = ""
                     # optimization -> remove tree.write("stego/document.xml")
                     N = 1
                     count_txt_tag += 1

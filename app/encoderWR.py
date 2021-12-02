@@ -232,9 +232,8 @@ def encoding(message, password, path_file_extracted):
                     new_run_elem.find("./" + TEXT_TAG).set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
                     paragraph.insert(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]").getparent().index(paragraph.find("./" + RUN_ELEMENT_TAG + "[" + (offset_run_elem).__str__() + "]")) + 1, new_run_elem)
                     offset_run_elem += 1
-                    if len(text[N:]) == 0 and new_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + VANISH_ELEM_TAG) == None:
-                        new_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG).append(etree.Element(VANISH_ELEM_TAG))
-                        new_run_elem.find("./" + TEXT_TAG).text = " "
+                    if len(text[N:]) == 0: # anche se <w:t> è vuoto, il decoder lo ignora dall'estrazione
+                        new_run_elem.find("./" + TEXT_TAG).text = ""
                     # optimization -> remove tree.write("stego/document.xml")
                     N = 1
                     count_txt_tag += 1
