@@ -19,7 +19,7 @@ def decoding(password, path_file_extracted):
 
     # Step 2 -> Estrai un paragrafo <w:p> in P alla volta
     paragraphs = root.findall("./" + BODY_TAG + "/" + PARAGRAPH_TAG)
-    count_r = 0
+
     for paragraph in paragraphs:
         # Step 3 -> Estrai tutti i run <w:r>⋯ </w:r> in R e considera solo quelli con il text element <w:t> ponendoli in T.
         run_elements = paragraph.findall("./" + RUN_ELEMENT_TAG)
@@ -32,7 +32,8 @@ def decoding(password, path_file_extracted):
                 continue
 
             mismatch = False
-            if i_run_elements + 1 < len(run_elements) and curr_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG) != None and curr_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG).get(PREFIX_WORD_PROC + "val") != "0":
+            if i_run_elements + 1 < len(run_elements) and curr_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG) != None \
+                    and curr_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG + "/" + SZCS_TAG).get(PREFIX_WORD_PROC + "val") != "0":
                 next_run_elem = run_elements[i_run_elements + 1]
                 curr_property_elements = curr_run_elem.find("./" + RUN_ELEM_PROPERTY_TAG)
                 # check if tag RPR is empty
@@ -61,9 +62,13 @@ def decoding(password, path_file_extracted):
     string_enc = "".join(chr(int("".join(map(str, message[i:i+8])), 2)) for i in range(0, len(message), 8))
     split_duplicate = string_enc.split(utils.MAGIC_CHAR_SPLIT)
     print("TESTO DECIFRATO: ")
+    count_text_secret = 0
     for p in split_duplicate:
         try:
-            print(utils.decrypt(password, p))
+            if utils.decrypt(password, p) != None:
+                count_text_secret += 1
+            #print(utils.decrypt(password, p))
         except:
             print("una duplicazione del testo segreto non può essere decifrata poichè incompleta --> " + p)
             continue
+    print("Numero di volte del messaggio secreto: " + count_text_secret.__str__())

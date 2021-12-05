@@ -246,14 +246,14 @@ def encoding(message, password, path_file_extracted):
         # Step 13 -> Ripeti dallo step 4 allo step 12 finché tutti i paragrafi P non sono stati risolti.
     # Verifica se il file dato in input ha la capacità di contenere la rappresentazione in bit del testo segreto cifrato
     total_counter_inclusion = i
-    total_complete_repeat_segret_text = total_counter_inclusion // len(information_to_encode_bits) # numero di volte in cui il testo segreto è stato incapsulato
+    total_complete_repeat_secret_text = total_counter_inclusion // len(information_to_encode_bits) # numero di volte in cui il testo segreto è stato incapsulato
     # Se il numero di bit del cifrato da iniettare è superiore alla capacità del documento di ammettere lo split del contenuto testuale -> annulla codifica
     if len(information_to_encode_bits) > total_counter_inclusion:
         utils.remove_directory(os.path.split(path_file_extracted)[0])
-        sys.exit("Non è stato possibile iniettare il testo segreto poichè presenta un numero di bits maggiori della capacità di inclusione!!\nFine!")
+        sys.exit("La capacità di inclusione del documento non è sufficiente per incapsulare il testo segreto!!\nFine!")
 
     # Stampa le statistiche in merito al numero di parole, inclusioni, bit da codificare e altro per il testing
-    utils.printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_segret_text)
+    utils.printStatistics(total_counter_characters, total_counter_inclusion, information_to_encode_bits, total_complete_repeat_secret_text)
     count_txt_tag += count_txt_tag_base
     print("document.xml statistics: <w:t> di base: " + count_txt_tag_base.__str__() + "; dopo: " + count_txt_tag.__str__())
 

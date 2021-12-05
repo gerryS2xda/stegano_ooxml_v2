@@ -26,7 +26,7 @@ def decoding(password, path_file_extracted):
             slides.remove(slide)
 
     for slide in slides:
-        print("Estrazione testo segreto da " + slide + "...")
+        #print("Estrazione testo segreto da " + slide + "...")
         # Step 2 -> Leggi il codice dal file "slides/slideX.xml", relativo al presentazione steganografata S
         tree = etree.parse(path_file_extracted + "/ppt/slides/" + slide)
         root = tree.getroot() #get <p:sld> element
@@ -61,6 +61,7 @@ def decoding(password, path_file_extracted):
                         if curr_property_elements != None:
                             # Step 8 -> Confronta gli attributi dell’elemento R e suoi relativi figli con il suo successore R+1 e suoi relativi figli
                             next_run_property_elements = next_run_elem.find("./" + RUN_ELEMENT_PROPERTY_TAG)
+
                             if len(curr_property_elements.keys()) == len(next_run_property_elements.keys()):
                                 for child_curr_property_elem in curr_property_elements:
                                     child_next_property_elem = next_run_property_elements.find("./" + child_curr_property_elem.tag)
@@ -85,14 +86,18 @@ def decoding(password, path_file_extracted):
                 # Step 10 -> Ripeti dallo step 5 allo step 9 finché tutti i paragrafi P non sono stati risolti
             # Step 11 -> Ripeti dallo step 3 allo step 9 finché tutti gli shape SP non sono stati risolti.
         # Step 12 -> Ripeti dallo step 2 allo step 11 finché non sono state considerate tutte le slide
-
     #step 13 -> Estrai il testo segreto H da M.
     string_enc = "".join(chr(int("".join(map(str, message[i:i+8])), 2)) for i in range(0, len(message), 8))
+
     split_duplicate = string_enc.split(utils.MAGIC_CHAR_SPLIT)
     print("TESTO DECIFRATO: ")
+    count_text_secret = 0
     for p in split_duplicate:
         try:
-            print(utils.decrypt(password, p))
+            if utils.decrypt(password, p) != None:
+                count_text_secret += 1
+            #print(utils.decrypt(password, p))
         except:
             print("Una duplicazione del testo segreto non può essere decifrata poichè incompleta --> " + p)
             continue
+    print("Numero di volte del messaggio secreto: " + count_text_secret.__str__())
