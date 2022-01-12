@@ -34,14 +34,17 @@ FONTNAME_RPR_TAG = PREFIX_EXCEL_PROC + "rFont"
 CHARSET_TAG = PREFIX_EXCEL_PROC + "charset"  # marker split tag
 
 # Applicazione formattazione a livello di cella presente in styles.xml nella Shared String Table (sharedStrings.xml)
-def apply_cell_styles_into_sst(path_file_xlsx_extracted):
+def apply_cell_styles_into_sst(path_file_xlsx_extracted, tree_sst_input):
 
     # LETTURA FILE XML INTERESSATI
     # Leggi il contenuto del file "styles.xml"
     tree_style = etree.parse(path_file_xlsx_extracted + "/xl/styles.xml")
 
-    # Leggi il contenuto del file "sharedStrings.xml"
-    tree_sst = etree.parse(path_file_xlsx_extracted + "/xl/sharedStrings.xml")
+    # Leggi il contenuto del file "sharedStrings.xml", se non viene già passato in input
+    if tree_sst_input == None:
+        tree_sst = etree.parse(path_file_xlsx_extracted + "/xl/sharedStrings.xml")
+    else:
+        tree_sst = tree_sst_input
 
     # Step 1 -> Estrai tutti i fogli di lavoro (sheetX.xml) dalla directory "worksheet" del workbook S
     sheets = os.listdir(path_file_xlsx_extracted + "/xl/worksheets")
@@ -84,8 +87,11 @@ def apply_cell_styles_into_sst(path_file_xlsx_extracted):
         # Step 13 -> Ripeti dallo step 3 allo step 12 finché tutte le righe "rows" utilizzate nel foglio di lavoro "sheet" non sono state risolte
     # Step 14 -> Ripeti dallo step 2 allo step 13 finché non sono stati esaminati tutti i fogli di lavoro presenti nella directory worksheet del xlsx steganografato
 
-    # Applicata la formattazione alla SST, scrivi il nuovo contenuto di "tree_sst" nel file "sharedStrings.xml"
-    tree_sst.write("stego/sharedStrings_new.xml")
+    if tree_sst_input == None: # se la SST non viene passata in input, scrivi la nuova SST nel file "sharedStrings.xml"
+        tree_sst.write("stego/sharedStrings.xml")
+
+    # Applicata la formattazione alla SST, restituisci il nuovo contenuto di "tree_sst" da scrivere poi in "sharedStrings.xml"
+    return tree_sst
 
 # Estrai la formattazione del contenuto testuale della cella sezionata presente in styles.xml, se presente
 def extract_cell_style_from_styles_xmlfile(tree_style, cell_index_style_value):
@@ -113,6 +119,7 @@ def extract_cell_style_from_styles_xmlfile(tree_style, cell_index_style_value):
 
     return font # Restituisci l'elemento <font> che contiene lo style della cella selezionata
 
+# Aggiungi la formattazione estratta al/ai run presenti nello string item della SST indicato dal valore di <v> della cella <c>
 def apply_fontstyle_into_string_in_sst(tree_sst, cell_value, font):
 
     root_sst = tree_sst.getroot() # get <sst> element
@@ -130,12 +137,13 @@ def apply_fontstyle_into_string_in_sst(tree_sst, cell_value, font):
         run_element.insert(0, rpr)  # aggiungi tag <rPr> in prima posizione prima di altri tag altrimenti non vengono applicate le proprietà
         run_element.append(text_tag_si)
         string_item.append(run_element)
-    font_children_tags = font.getchildren()  # prendi tutti gli elementi figli di <font>...
     # Altrimenti, per ciascun run (tag <r>) presente nel <si> selezionato...
     # ... aggiungi il contenuto dell'elemento <font> estratto da style nelle proprietà del run (<rPr)
     run_elements = string_item.findall("./" + RUN_ELEMENT_TAG) # Estrai tutti i run presenti in "string_item"...
+    font_children_tags = font.getchildren()  # prendi tutti gli elementi figli di <font>...
     for run in run_elements: # ... per ciascun run
-        for element_tag in font_children_tags:  # ... aggiungi i figli di "font"
-            run.find("./" + RUN_ELEMENT_PROPERTY_TAG).append(element_tag)
+        for element_tag in font_children_tags:  # ... aggiungi i figli di "font", se non sono presenti
+            if run.find("./" + RUN_ELEMENT_PROPERTY_TAG + "/" + element_tag.tag) == None:
+                run.find("./" + RUN_ELEMENT_PROPERTY_TAG).append(element_tag)
         new_run = copy.copy(run) # usa la copia per risolvere problema di non modifica dei riferimenti (distacca run modificato da "string_item")
         string_item.replace(run, new_run) # rimpiazza il run corrente nel "string_item" con il nuovo run

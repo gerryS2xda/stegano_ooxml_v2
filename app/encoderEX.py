@@ -5,8 +5,8 @@ import sys
 from distutils.dir_util import copy_tree
 from lxml import etree
 import copy
-import random
 from app import utils
+from app import impercettibilityEX
 
 #Constant for XML SpreadSheetML element
 PREFIX_EXCEL_PROC = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
@@ -277,6 +277,9 @@ def encoding(message, password, path_file_extracted):
     count_txt_tag += count_txt_tag_base
     print("sharedStrings.xml statistics: <t> di base: " + count_txt_tag_base.__str__() + "; dopo: " + count_txt_tag.__str__())
 
+    # Prima di creare il file steganografato, aggiungi la formattazione a livello di cella presente in styles.xml alla SST per fixare l'impercettibilità
+    tree_sst = impercettibilityEX.apply_cell_styles_into_sst(path_file_extracted, tree)
+
     # Crea il file steganografato
-    createFileStego(tree, path_file_extracted)
+    createFileStego(tree_sst, path_file_extracted)
     print("Il file .xlsx steganografato è stato salvato nella directory \"stego\"")
