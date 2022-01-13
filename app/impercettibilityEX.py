@@ -63,9 +63,7 @@ def apply_cell_styles_into_sst(path_file_xlsx_extracted, tree_sst_input):
         for row in rows: # per ciascun riga tra tutte quelle presenti nel sheet
             # Step 4 -> # Estrai tutte le celle presenti nella riga "row"
             cells = row.findall("./" + CELL_ELEMENT_TAG)
-            i = -1
             for cell in cells: # per ciascuna cella tra tutte quelli presenti nella riga "row"
-                i+=1
                 # Verifica se la cella ammette come tipo di contenuto una shared string e se considera lo stile in styles.xml
                 if cell.get(CELL_TYPEDATA_ATTRIBUTE) != "s":
                     continue
@@ -83,7 +81,6 @@ def apply_cell_styles_into_sst(path_file_xlsx_extracted, tree_sst_input):
                 # Step 9-10-11 -> Aggiungi la formattazione estratta al/ai run presenti nello string item della SST indicato dal valore di <v> della cella <c>
                 apply_fontstyle_into_string_in_sst(tree_sst, cell_value, font)
             # Step 12 -> Ripeti dallo step 4 allo step 11 finché tutte le celle <c> nella riga "row" non sono state risolte
-            i+=1
         # Step 13 -> Ripeti dallo step 3 allo step 12 finché tutte le righe "rows" utilizzate nel foglio di lavoro "sheet" non sono state risolte
     # Step 14 -> Ripeti dallo step 2 allo step 13 finché non sono stati esaminati tutti i fogli di lavoro presenti nella directory worksheet del xlsx steganografato
 
