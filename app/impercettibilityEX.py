@@ -7,6 +7,8 @@ PRESET_TABLE_STYLE_XML_FILE_PATH = "./external_xml/presetTableStyles.xml"
 
 # Constant for XML SpreadSheetML element
 PREFIX_EXCEL_PROC = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+PREFIX_RELATIONSHIP_EXCEL_NAMESPACE = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
+REL_ID_ATTRIBUTE = PREFIX_RELATIONSHIP_EXCEL_NAMESPACE + "id"
 
 # Constant for XML Worksheet
 WORKSHEET_ROOT_TAG = PREFIX_EXCEL_PROC + "worksheet" # root element of sheetX.xml
@@ -38,11 +40,10 @@ TEXT_TAG = PREFIX_EXCEL_PROC + "t"
 FONTNAME_RPR_TAG = PREFIX_EXCEL_PROC + "rFont"
 CHARSET_TAG = PREFIX_EXCEL_PROC + "charset"  # marker split tag
 
-# Constant for XML Relationship
+# Constant for XML Relationship (.rels file)
 PREFIX_RELATHIONSHIP_NAMESPACE = "{http://schemas.openxmlformats.org/package/2006/relationships}"
-REL_ID_ATTRIBUTE = PREFIX_RELATHIONSHIP_NAMESPACE + "id"
-RELATIONSHIPS_ROOT_ELEMENT = PREFIX_RELATHIONSHIP_NAMESPACE + "relationships"
-RELATIONSHIP_ELEMENT_TAG = PREFIX_RELATHIONSHIP_NAMESPACE + "relationship"
+RELATIONSHIPS_ROOT_ELEMENT = PREFIX_RELATHIONSHIP_NAMESPACE + "Relationships"
+RELATIONSHIP_ELEMENT_TAG = PREFIX_RELATHIONSHIP_NAMESPACE + "Relationship"
 RELATIONSHIP_ID_ATTRIBUTE = "Id"
 RELATIONSHIP_TARGET_ATTRIBUTE = "Target"
 
@@ -203,8 +204,8 @@ def apply_cell_table_style_into_sst(path_file_xlsx_extracted, tree_sst_input):
 
         # Leggi il contenuto del file ".rels" associato a "sheet" estraendo il suo root element
         sheet_rels_file = sheet + ".rels"
-        tree_sheet_rels = etree.parse(path_file_xlsx_extracted + "/xl/worksheets/_rels" + sheet_rels_file)
-        root_sheet_rels = tree_sheet_rels.getroot() # get <Relationship> element
+        tree_sheet_rels = etree.parse(path_file_xlsx_extracted + "/xl/worksheets/_rels/" + sheet_rels_file)
+        root_sheet_rels = tree_sheet_rels.getroot() # get <Relationships> element
 
         # Step 4 -> Estrai tutti i figli dell'elemento <tableParts>
         table_parts = root_worksheet.findall("./" + TABLEPARTS_ELEMENT_TAG + "/" + TABLEPART_ELEMENT_TAG)
@@ -213,7 +214,7 @@ def apply_cell_table_style_into_sst(path_file_xlsx_extracted, tree_sst_input):
             table_rel_id = table.get(REL_ID_ATTRIBUTE)
 
             # Step 6 -> Estrai tutte le relazioni presenti "sheet_rels_file" e seleziona quella il cui attributo "Id" è uguale a "table_rel_id"
-            relationships = root_sheet_rels.findall("./" + RELATIONSHIPS_ROOT_ELEMENT + "/" + RELATIONSHIP_ELEMENT_TAG)
+            relationships = root_sheet_rels.findall("./" + RELATIONSHIP_ELEMENT_TAG)
             table_path = None # memorizza in questa variabile il valore dell'attributo "Target" della relazione selezionata
             for rel in relationships:
                 if rel.get(RELATIONSHIP_ID_ATTRIBUTE) == table_rel_id:
@@ -229,6 +230,8 @@ def apply_cell_table_style_into_sst(path_file_xlsx_extracted, tree_sst_input):
             font_style_header_row, font_style_whole_table = extract_fonts_table_style_from_presettablestylexml(tree_preset_table_style, table_style_name)
             if font_style_header_row == None or font_style_whole_table == None:
                 continue # alla tabella attuale non viene applicata la formattazione del testo o per la riga di intestazione o per l'intera tabella
+
+
 
 
 # Estrai le informazioni su una tabella indicata da "table_path" relative al nome dello stile e le celle usate
@@ -265,7 +268,7 @@ def extract_fonts_table_style_from_presettablestylexml(tree_preset_table_style, 
     font_style_wholetable = None
 
     # Estrai tutti i figli dell'elemento <dxfs> che definiscono la formattazione da applicare alle varie aree della tabella
-    dxfs = root_preset_table_style.findall("./" + DXFS_PST_TAG + "/" + DXF_PST_TAG)
+    dxfs = table_style_name_tag.findall("./" + DXFS_PST_TAG + "/" + DXF_PST_TAG)
 
     # Estrai da <tableStyle> tutti gli elementi figli <tableStyleElement> selezionando quelli richiesti
     table_style_element_tags = table_style_tag.findall("./" + TABLESTYLEELEMENT_PST_TAG)
@@ -273,7 +276,7 @@ def extract_fonts_table_style_from_presettablestylexml(tree_preset_table_style, 
         # Seleziona <tableStyleElement> il cui attributo "type" è uguale a "headerRow"
         if tag.get("type") == "headerRow":
             # Seleziona l'elemento <dxf> da "dxfs" indicato dall'attributo "dxfId" di <tableStyleElement> selezionato
-            dxf = dxfs[tag.get("dxfId")]
+            dxf = dxfs[int(tag.get("dxfId"))-1]
             # Verifica se <dxf> selezionato contiene l'elemento <font>
             if dxf.find("./" + FONT_PST_TAG) == None:
                 continue # non viene applicata la formattazione del contenuto testuale alla riga di intestazione
@@ -281,7 +284,7 @@ def extract_fonts_table_style_from_presettablestylexml(tree_preset_table_style, 
         # Seleziona <tableStyleElement> il cui attributo "type" è uguale a "wholeTable"
         elif tag.get("type") == "wholeTable":
             # Seleziona l'elemento <dxf> da "dxfs" indicato dall'attributo "dxfId" di <tableStyleElement> selezionato
-            dxf = dxfs[tag.get("dxfId")]
+            dxf = dxfs[int(tag.get("dxfId"))-1]
             # Verifica se <dxf> selezionato contiene l'elemento <font>
             if dxf.find("./" + FONT_PST_TAG) == None:
                 continue  # non viene applicata la formattazione del contenuto testuale alla riga di intestazione
