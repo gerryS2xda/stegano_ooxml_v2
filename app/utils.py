@@ -5,6 +5,7 @@ import sys
 from base64 import urlsafe_b64encode
 import hashlib
 from cryptography.fernet import Fernet
+import re
 
 FILE_EXTENSION_ACCEPTED = [".docx", ".pptx", ".xlsx"]
 SALT = "1234567891234567".encode('utf-8')
@@ -74,3 +75,13 @@ def extract_ooxml_input_file_in_working_directory(path_working_directory, path_i
 def remove_directory(path_dir_to_remove):
     if os.path.exists(path_dir_to_remove):
         shutil.rmtree(path_dir_to_remove)
+
+# Extract range of cells (es. "A3:O103") using by a table in a worksheet XML (Excel)
+def extract_startend_row_column_cell_used_by_table(range_cell_table):
+    x = range_cell_table.split(":") # es. ['A3', 'O103']
+    row_start = int(re.findall(r'\d+', x[0])[0]) # es. 3
+    row_end = int(re.findall(r'\d+', x[1])[0]) # es. 103
+    col_start = re.findall(r'[A-Z]+', x[0])[0] # 'A'
+    col_end = re.findall(r'[A-Z]+', x[1])[0] # 'O'
+
+    return row_start, row_end, col_start, col_end
