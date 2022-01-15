@@ -86,10 +86,10 @@ def extract_cell_style_from_styles_xmlfile(tree_style, cell_index_style_value):
         rfont_tag.set("val", font_name_val)
         font.replace(font.find("./" + FONTNAME_STYLE_TAG), rfont_tag)
 
-    return font # Restituisci l'elemento <font> che contiene lo style della cella selezionata
+    return list(font) # Restituisci la lista degli elementi figli di <font> che contiene lo style della cella selezionata
 
 # Aggiungi la formattazione estratta al/ai run presenti nello string item della SST indicato dal valore di <v> della cella <c>
-def apply_fontstyle_into_string_in_sst(tree_sst, cell_value, font):
+def apply_fontstyle_into_string_in_sst(tree_sst, cell_value, font_tag_child_list):
 
     root_sst = tree_sst.getroot() # get <sst> element
 
@@ -109,9 +109,8 @@ def apply_fontstyle_into_string_in_sst(tree_sst, cell_value, font):
     # Altrimenti, per ciascun run (tag <r>) presente nel <si> selezionato...
     # ... aggiungi il contenuto dell'elemento <font> estratto da style nelle proprietà del run (<rPr)
     run_elements = string_item.findall("./" + RUN_ELEMENT_TAG) # Estrai tutti i run presenti in "string_item"...
-    font_children_tags = font.getchildren()  # prendi tutti gli elementi figli di <font>...
     for run in run_elements: # ... per ciascun run
-        for element_tag in font_children_tags:  # ... aggiungi i figli di "font", se non sono presenti
+        for element_tag in font_tag_child_list:  # ... aggiungi i figli di "font", se non sono presenti
             if run.find("./" + RUN_ELEMENT_PROPERTY_TAG + "/" + element_tag.tag) == None:
                 run.find("./" + RUN_ELEMENT_PROPERTY_TAG).append(element_tag)
         new_run = copy.copy(run) # usa la copia per risolvere problema di non modifica dei riferimenti (distacca run modificato da "string_item")
@@ -174,7 +173,7 @@ def extract_fonts_table_style_from_presettablestylexml(tree_preset_table_style, 
                 continue  # non viene applicata la formattazione del contenuto testuale alla riga di intestazione
             font_style_wholetable = dxf.find("./" + FONT_PST_TAG)
 
-    return font_style_headerrow, font_style_wholetable # rest. l'elemento <font> applicato alla riga di intestazione e intera table
+    return list(font_style_headerrow), list(font_style_wholetable) # rest. il contenuto di <font> applicato alla riga di intestazione e intera table
 
 
 # Applicazione formattazione a livello di cella presente in styles.xml nella Shared String Table (sharedStrings.xml)
