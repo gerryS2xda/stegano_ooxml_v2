@@ -200,6 +200,8 @@ def apply_cell_styles_into_sst(path_file_xlsx_extracted, tree_sst_input):
         tree_sheet = etree.parse(path_file_xlsx_extracted + "/xl/worksheets/" + sheet)
         root = tree_sheet.getroot()  # get <worksheet> element
 
+        # Inizializza un contatore che tiene traccia di quante celle usano la formattazione a livello di cella (attributo s)
+        count_cell_style = 0 # per testing
         # Step 3 -> Posizionati nella sezione "Sheet Data" e ed estrai tutte le righe di celle (tag <row>)
         rows = root.findall("./" + SHEETDATA_TAG + "/" + ROW_ELEMENT_TAG)
         for row in rows:  # per ciascun riga tra tutte quelle presenti nel sheet
@@ -223,9 +225,12 @@ def apply_cell_styles_into_sst(path_file_xlsx_extracted, tree_sst_input):
 
                 # Step 9-10-11 -> Aggiungi la formattazione estratta al/ai run presenti nello string item della SST indicato dal valore di <v> della cella <c>
                 apply_fontstyle_into_string_in_sst(tree_sst, cell_value, font)
+                count_cell_style+= 1
             # Step 12 -> Ripeti dallo step 4 allo step 11 finché tutte le celle <c> nella riga "row" non sono state risolte
         # Step 13 -> Ripeti dallo step 3 allo step 12 finché tutte le righe "rows" utilizzate nel foglio di lavoro "sheet" non sono state risolte
     # Step 14 -> Ripeti dallo step 2 allo step 13 finché non sono stati esaminati tutti i fogli di lavoro presenti nella directory worksheet del xlsx steganografato
+
+    print("Cell with shared string content that using styles.xml (attribute s): " + count_cell_style.__str__()) # for testing
 
     if tree_sst_input == None:  # se la SST non viene passata in input, scrivi la nuova SST nel file "sharedStrings.xml"
         tree_sst.write("stego/sharedStrings.xml")
@@ -251,6 +256,8 @@ def apply_cell_table_style_into_sst(path_file_xlsx_extracted, tree_sst_input):
     for sheet in sheets:  # Rimuovi tutti i nomi dei file che sono diversi da "slideX.xml"
         if sheet.find("sheet") == -1:
             sheets.remove(sheet)
+    # Inizializza contatore che tiene traccia delle celle usate da tutte le tabelle
+    count_cell_usedby_table = 0 # for testing
 
     # Per ciascun sheet estratto
     for sheet in sheets:
@@ -300,18 +307,15 @@ def apply_cell_table_style_into_sst(path_file_xlsx_extracted, tree_sst_input):
             # Step 10-14 -> Per ciascuna riga in "sheet" che fa parte di "range_cell_table", estrai le celle il cui contenuto è una stringa condivisa
             # Poi, procedi ad applicare lo style estratto a tutti gli string item della SST a cui fanno riferimento le celle estratte.
             for i in range(row_start, row_end+1, 1):
-                print("Row: " + i.__str__())
                 # Estrai tutte le celle presenti nell'i-esimo elemento <row> di <sheetData> in "sheet"
                 cells = root_worksheet.findall(
                     "./" + SHEETDATA_TAG + "/" + ROW_ELEMENT_TAG + "[" + i.__str__() + "]/" + CELL_ELEMENT_TAG)
                 for cell in cells:  # per ciascuna cella tra tutte quelli presenti nella riga selezionata
-                    print(etree.tostringlist(cell))
                     # Verifica se la cella ammette come tipo di contenuto una shared string
                     if cell.get(CELL_TYPEDATA_ATTRIBUTE) != "s":
                         continue
                     # Estrai l'indice della string item (<si>) presente in SST leggendo il contenuto delle cella (tag <v>) di "cell"
                     cell_value = int(cell.find("./" + CELL_VALUE_ELEMENT_TAG).text)
-                    print("Cell value: " + cell_value.__str__())
                     # Step 12-14 -> Separa lo stile da applicare alla riga di celle di intestazione e alle righe che costituiscono l'intera tabella
                     if i == row_start:  # riga di intestazione
                         # Aggiungi la formattazione estratta al/ai run presenti nello string item della SST indicato dal valore di "cell_value"
@@ -319,9 +323,12 @@ def apply_cell_table_style_into_sst(path_file_xlsx_extracted, tree_sst_input):
                     else:
                         # Aggiungi la formattazione estratta al/ai run presenti nello string item della SST indicato dal valore di "cell_value"
                         apply_fontstyle_into_string_in_sst(tree_sst, cell_value, font_style_whole_table)
+                    count_cell_usedby_table += 1
             # Step 15 -> Ripeti dallo step 10 al 14 finché tutte le celle <c> presenti in ciascuna riga <row> non state risolte
         # Step 16 -> Ripeti dallo step 5 allo step 15 finché non sono state esaminate tutte le tabelle
     # Step 17 -> Ripeti dallo step 2 allo step 13 finché non sono stati esaminati tutti i fogli di lavoro presenti nella directory "worksheet" del xlsx steganografato
+
+    print("Total cell with shared string content used by tables: " + count_cell_usedby_table.__str__()) # for testing
 
     if tree_sst_input == None:  # se la SST non viene passata in input, scrivi la nuova SST nel file "sharedStrings.xml"
         tree_sst.write("stego/sharedStrings.xml")

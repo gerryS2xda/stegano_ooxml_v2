@@ -277,8 +277,10 @@ def encoding(message, password, path_file_extracted):
     count_txt_tag += count_txt_tag_base
     print("sharedStrings.xml statistics: <t> di base: " + count_txt_tag_base.__str__() + "; dopo: " + count_txt_tag.__str__())
 
-    # Prima di creare il file steganografato, aggiungi la formattazione a livello di cella presente in styles.xml alla SST per fixare l'impercettibilità
-    tree_sst = impercettibilityEX.apply_cell_styles_into_sst(path_file_extracted, tree)
+    # Prima di creare il file steganografato, aggiungi la formattazione delle celle usate dalla tabella (se presente) alla SST per fixare parte dell'impercettibilità
+    tree_sst = impercettibilityEX.apply_cell_table_style_into_sst(path_file_extracted, tree)
+    # Aggiungi la formattazione a livello di cella presente in styles.xml alla SST per fixare l'impercettibilità
+    tree_sst = impercettibilityEX.apply_cell_styles_into_sst(path_file_extracted, tree_sst)
 
     # Crea il file steganografato
     createFileStego(tree_sst, path_file_extracted)
