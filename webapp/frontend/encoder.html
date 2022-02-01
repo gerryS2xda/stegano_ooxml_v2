@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nascondi testo</title>
+    <link type="text/css" rel="stylesheet" href="./css/encoder_styles.css">
+</head>
+<body>
+    <h1 class="title_page">Nascondi testo in un documento Microsoft Office</h1>
+    <div class="main_container">
+        <div class="container_form">
+          <form action="/action_page.php">
+            <div class="row">
+              <div class="col-25">
+                <label for="upload_cover_file">Seleziona il cover file (.docx, .pptx, .xlsx)</label>
+              </div>
+              <div class="col-75">
+                <input type="file" id="upload_cover_file" name="upload_cover_file">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-25">
+                <label for="secret_text">Testo da nascondere </label>
+              </div>
+              <div class="col-75">
+                <input type="text" id="secret_text" name="secret_text" placeholder="Es. &#147;Hello world!&#148;">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-25">
+                <label for="password_encrypt">Password per la cifratura del testo </label>
+              </div>
+              <div class="col-75">
+                <input type="text" id="password_encrypt" name="password_encrypt" placeholder="Es. &#147;pwd1234&#148;">
+              </div>
+            </div>
+            <div class="row btn_area">
+              <input type="submit" id="hide_txt_action" value="Nascondi testo">
+            </div>
+          </form>
+        </div>
+    </div>
+</body>
+</html>
