@@ -33,6 +33,22 @@ $("#hide_txt_action").click(function(){ //pulsante "Nascondi testo"
     //Aggiorna il pulsante con pulsante "Loading..."
 
     //...richiesta servlet
+    var coverfile = $("#upload_cover_file")[0].files[0]; //object file
+    var text_to_hide = $("#secret_text").val(); //string
+    var password_enc = $("#password_encrypt").val(); //string
+
+    alert(" Text: " + text_to_hide + "; Password: " + password_enc);
+   /*
+    $.post("encoder-controller", {"action": "hideText", "coverfile": coverfile, "secretText", text_to_hide, "passwordEnc", password_enc},
+      function(resp, status, xhr){
+		if(xhr.readyState == 4 & status=="success"){
+			var o = JSON.parse(resp); //conversione in oggetto JS da strina JSON ricevuta da servlet
+			//...
+		}else{
+			//window.location.href = "./error.jsp"; //pagina errore 404
+		}
+	});
+	*/
 
     //Mostra popup successo operazione
     $("#content_popup_downstego").show();
@@ -74,6 +90,10 @@ $("#extract_txt_action").click(function(){ //pulsante "Estrai testo nascosto"
     //Aggiorna il pulsante con pulsante "Loading..."
 
     //...richiesta servlet
+    var stegofile = $("#upload_stego_file")[0].files[0]; //object file
+    var password_dec = $("#password_decrypt").val(); //string
+
+
 
     //Mostra popup successo operazione
     $("#content_popup_extracttext").show();
