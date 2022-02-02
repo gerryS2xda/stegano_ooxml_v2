@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Steganografia in MS-Office</title>
+    <link type="text/css" rel="stylesheet" href="./css/index_style.css">
+    <!-- Icon library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+</head>
+<body onload="hideAllContentExceptMainArea();">
+    <h1 class="title_page">Steganografia nei documenti Microsoft Office</h1>
+    <!-- Select mode area -->
+    <div id="main_container">
+        <div class="center_content">
+            <div id = "encoder_image_select_container">
+                <button id="encoder_image_button">
+                    <img id="encoder_image" src="./image/HideAText.png" alt="Nascondi testo"/>
+                    <p class="label_select_mode">Nascondi un testo</p>
+                </button>
+            </div>
+            <div id = "decoder_image_select_container">
+                <button id="decoder_image_button">
+                    <img id="decoder_image" src="./image/extractTextIcon.png" alt="Estrai testo segreto"/>
+                    <p class="label_select_mode">Estrai un testo segreto</p>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- encoder area -->
+    <div id="encoder_area_container">
+        <!-- Popup area -->
+        <div id="content_popup_downstego">
+            <div class="center_popup">
+                <div id="content_popup_down_area">
+                    <h1>Nascondi un testo</h1>
+                    <p class="p_popup_label_center">Il testo è stato nascosto o incapsulato con successo nel cover file!!</p>
+                    <div class="content_pop_button_area">
+                       <!-- <button class="button_form_popup_style button_space_right_popup" id="cancel_download_stego_action"><i class="fa fa-close"></i> Annulla</button>-->
+                        <button class="button_form_popup_style single_button_form_popup" id="download_stego_action"><i class="fas fa-file-download"></i> Download stego file</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="content_popup_error_hidetext">
+            <div id="content_popup_error_hidetext_area">
+                <h1>Nascondi un testo</h1>
+                <p class="p_popup_label_center_err">Impossibile completare l'operazione! Non vi è abbastanza capacità di inclusione per nascondere un testo!!</p>
+                <div class="content_pop_button_area">
+                    <button class="button_form_popup_style" onclick="removePopupErrorHideText();">Riprova</button>
+                </div>
+            </div>
+        </div>
+        <!-- Encoder area main content-->
+        <div class="container_form">
+            <p class="p_title_mode">Nascondi un testo in un documento Office</p>
+            <div>
+                <div class="row">
+                  <div class="col-25">
+                    <label for="upload_cover_file">Seleziona il cover file (.docx, .pptx, .xlsx)</label>
+                  </div>
+                  <div class="col-75">
+                    <input type="file" id="upload_cover_file" name="upload_cover_file">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-25">
+                    <label for="secret_text">Testo da nascondere </label>
+                  </div>
+                  <div class="col-75">
+                    <input type="text" id="secret_text" name="secret_text" placeholder="Es. &#147;Hello world!&#148;">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-25">
+                    <label for="password_encrypt">Password per la cifratura del testo </label>
+                  </div>
+                  <div class="col-75">
+                    <input type="text" id="password_encrypt" name="password_encrypt" placeholder="Es. &#147;pwd1234&#148;">
+                  </div>
+                </div>
+                <div class="row btn_area">
+                    <button class="button_form_style button_space_right" onclick="showHomeContent()"><i class="fa fa-home"></i> Home</button>
+                    <button class="button_form_style" id="hide_txt_action"><i class="fa fa-eye-slash"></i> Nascondi testo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Decoder area -->
+    <div id="decoder_area_container">
+        <!-- Popup area -->
+        <div id="content_popup_extracttext">
+            <div class="center_popup">
+                <div id="content_popup_extracttext_area">
+                    <h1>Estrazione testo nascosto</h1>
+                    <p class="p_popup_label_left">Il testo nascosto è</p>
+                    <textarea id="extract_text_textarea" name="extract_text_textarea" rows="4" cols="50" disabled></textarea>
+                    <div class="content_pop_button_area">
+                       <!-- <button class="button_form_popup_style button_space_right_popup" id="cancel_download_stego_action"><i class="fa fa-close"></i> Annulla</button>-->
+                        <button class="button_form_popup_style single_button_form_popup" id="ok_extracted_text_btn">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="content_popup_error_extracttext">
+            <div id="content_popup_error_extracttext_area">
+                <h1>Estrazione testo nascosto</h1>
+                <p class="p_popup_label_center_err">Impossibile completare l'operazione! Password errata o testo segreto non presente!</p>
+                <div class="content_pop_button_area">
+                    <button class="button_form_popup_style single_button_form_popup" onclick="removePopupErrorHideText();">Riprova</button>
+                </div>
+            </div>
+        </div>
+        <!-- Encoder area main content-->
+        <div class="container_form">
+            <p class="p_title_mode">Estrai un testo nascosto da un documento Office</p>
+            <div>
+                <div class="row">
+                  <div class="col-25">
+                    <label for="upload_stego_file">Seleziona il file steganografato</label>
+                  </div>
+                  <div class="col-75">
+                    <input type="file" id="upload_stego_file" name="upload_stego_file">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-25">
+                    <label for="password_decrypt">Password per decifrare il testo </label>
+                  </div>
+                  <div class="col-75">
+                    <input type="text" id="password_decrypt" name="password_decrypt" placeholder="Es. &#147;pwd1234&#148;">
+                  </div>
+                </div>
+                <div class="row btn_area">
+                    <button class="button_form_style button_space_right" onclick="showHomeContent()"><i class="fa fa-home"></i> Home</button>
+                    <button class="button_form_style" id="extract_txt_action"><i class="fas fa-file-export"></i> Estrai testo nascosto</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="script/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="script/index_script.js"></script>
+</body>
+</html>
