@@ -1,5 +1,8 @@
 import socketserver
 from http.server import SimpleHTTPRequestHandler
+from urllib.parse import urlparse
+from urllib.parse import parse_qs
+import cgi
 
 # Server configuration
 hostName = "localhost"
@@ -14,7 +17,18 @@ class MyHttpRequestHandlerServer(SimpleHTTPRequestHandler):
         if self.path == "/":
             self.path = "/frontend/index.html"
 
+        """
+        controller_type = self.path.split('?')[0]
 
+        # Encoder controller
+        if controller_type == "/encoder-controller":
+            # Estrai i parametri della richiesta dall'url
+            params = parse_qs(urlparse(self.path).query)
+            print(params) # {'action': ['hideText'], 'coverfile': ['{}'], 'secretText': ['HelloWorld'], 'passwordEnc': ['123ad']}
+            #action = params["action"][0]
+            self.send_response(200)
+            self.end_headers()
+        """
 
         """
         # Specifica codice di risposta
@@ -35,6 +49,37 @@ class MyHttpRequestHandlerServer(SimpleHTTPRequestHandler):
             self.wfile.write(bytes("<p>This is an example web server.</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
         """
+        return SimpleHTTPRequestHandler.do_GET(self)
+
+    def do_POST(self):
+        controller_type = self.path.split('?')[0]
+
+        # Encoder controller
+        if controller_type == "/encoder-controller":
+            # Estrai i parametri della richiesta POST
+            form = cgi.FieldStorage(
+                fp=self.rfile,
+                headers=self.headers,
+                environ={'REQUEST_METHOD': 'POST',
+                         'CONTENT_TYPE': self.headers['Content-Type'],
+                         })
+            action = form.getvalue("action")
+            print(action)
+            if action == "hideText":
+                # Get uploaded file from POST request
+                cover_filename = form["coverfile"].filename
+                print(cover_filename)
+                coverfile = form["coverfile"].file.read()
+                open("working_directory/" + cover_filename, "wb").write(coverfile)
+
+                secret_text = form.getvalue("secretText")
+                password_enc = form.getvalue("passwordEnc")
+                print(secret_text)
+                print(password_enc)
+
+            self.send_response(200)
+            self.end_headers()
+
         return SimpleHTTPRequestHandler.do_GET(self)
 
 # Avvio e stop del server

@@ -32,34 +32,35 @@ function showHomeContent(){ //pulsante "Home"
 $("#hide_txt_action").click(function(){ //pulsante "Nascondi testo"
     //Aggiorna il pulsante con pulsante "Loading..."
 
-    //...richiesta servlet
+    // Send HTTP POST Request to server
     var coverfile = $("#upload_cover_file")[0].files[0]; //object file
     var text_to_hide = $("#secret_text").val(); //string
     var password_enc = $("#password_encrypt").val(); //string
 
-    alert(" Text: " + text_to_hide + "; Password: " + password_enc);
-   /*
-    $.post("encoder-controller", {"action": "hideText", "coverfile": coverfile, "secretText", text_to_hide, "passwordEnc", password_enc},
-      function(resp, status, xhr){
-		if(xhr.readyState == 4 & status=="success"){
-			var o = JSON.parse(resp); //conversione in oggetto JS da strina JSON ricevuta da servlet
-			//...
-		}else{
-			//window.location.href = "./error.jsp"; //pagina errore 404
-		}
-	});
-	*/
+    var fd = new FormData(); // create FormData to send data with POST req
+    fd.append('action', "hideText");
+    fd.append('coverfile', coverfile);
+    fd.append('secretText', text_to_hide);
+    fd.append('passwordEnc', password_enc);
 
-    //Mostra popup successo operazione
-    $("#content_popup_downstego").show();
-    $("#content_popup_downstego").addClass("popup_body");
-
-    //Mostra popup operazione fallita
-    //$("#content_popup_error_hidetext").show();
-    //$("#content_popup_error_hidetext").addClass("popup_body");
-
-    //Al termine dell'operazione, vai alla home
-    //showHomeContent();
+    $.ajax({
+        url: 'encoder-controller',
+        type: 'POST',
+        data: fd,
+        contentType: false,
+        processData: false,
+        success: function(result,status,xhr){
+            if(xhr.readyState == 4 & status == "success"){
+                //Mostra popup successo operazione
+                $("#content_popup_downstego").show();
+                $("#content_popup_downstego").addClass("popup_body");
+            }else{
+                //Mostra popup operazione fallita
+                $("#content_popup_error_hidetext").show();
+                $("#content_popup_error_hidetext").addClass("popup_body");
+            }
+        },
+    });
 });
 
 $("#cancel_download_stego_action").click(function(){ //pulsante "Annulla" del popup "Download stego file"
