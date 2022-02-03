@@ -1,12 +1,21 @@
 import socketserver
+import cgi
+import os
+import sys
+import time
 from http.server import SimpleHTTPRequestHandler
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
-import cgi
+from webapp.backend import split_method_stegano
 
 # Server configuration
 hostName = "localhost"
 serverPort = 8080
+
+# Other configuration
+INPUT_FILES_DIR = "./backend/input_files"
+WORKING_DIRECTORY_PATH = "./backend/working_directory"
+OUTPUT_STEGO_DIRECTORY = "./backend/output_stego"
 
 # Classe che riceverà e risponderà alla richieste HTTP
 class MyHttpRequestHandlerServer(SimpleHTTPRequestHandler):
@@ -66,16 +75,23 @@ class MyHttpRequestHandlerServer(SimpleHTTPRequestHandler):
             action = form.getvalue("action")
             print(action)
             if action == "hideText":
-                # Get uploaded file from POST request
+                # Get uploaded file from POST request and put it in "working_directory" folder
                 cover_filename = form["coverfile"].filename
                 print(cover_filename)
                 coverfile = form["coverfile"].file.read()
-                open("working_directory/" + cover_filename, "wb").write(coverfile)
+                open(INPUT_FILES_DIR + "/" + cover_filename, "wb").write(coverfile)
 
+                # Get text to hide and password to encrypt text
                 secret_text = form.getvalue("secretText")
                 password_enc = form.getvalue("passwordEnc")
-                print(secret_text)
-                print(password_enc)
+
+                # Run encoder
+                esito_op = split_method_stegano.run_encoder(cover_filename, secret_text, password_enc)
+                if not esito_op: # se l'operazione è fallita
+                    print("Operazione fallita")
+                else:
+                    print("Operazione eseguita correttamente")
+
 
             self.send_response(200)
             self.end_headers()
