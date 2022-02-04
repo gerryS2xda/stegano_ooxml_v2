@@ -112,7 +112,7 @@ label {
 }
 
 /* Style the submit button */
-.button_form_style {
+.button_form_style, .button_load {
   background-color: #04AA6D;
   color: white;
   padding: 12px 20px;
@@ -128,6 +128,10 @@ label {
 
 .button_form_style:hover {
   background-color: RoyalBlue;
+}
+
+#loading_btn_hidetxt, #loading_btn_extracttxt{
+    display: none;
 }
 
 /* Style the container */

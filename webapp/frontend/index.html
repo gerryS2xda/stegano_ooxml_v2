@@ -47,7 +47,7 @@
                 <h1>Nascondi un testo</h1>
                 <p class="p_popup_label_center_err">Impossibile completare l'operazione! Non vi è abbastanza capacità di inclusione per nascondere un testo!!</p>
                 <div class="content_pop_button_area">
-                    <button class="button_form_popup_style" onclick="removePopupErrorHideText();">Riprova</button>
+                    <button class="button_form_popup_style single_button_form_popup" onclick="removePopupErrorHideText();">Riprova</button>
                 </div>
             </div>
         </div>
@@ -80,8 +80,9 @@
                   </div>
                 </div>
                 <div class="row btn_area">
-                    <button class="button_form_style button_space_right" onclick="showHomeContent()"><i class="fa fa-home"></i> Home</button>
+                    <button class="button_form_style button_space_right" id="home_btn_hidetext" onclick="showHomeContent()"><i class="fa fa-home"></i> Home</button>
                     <button class="button_form_style" id="hide_txt_action"><i class="fa fa-eye-slash"></i> Nascondi testo</button>
+                    <button class="button_load single_button_form_popup" id="loading_btn_hidetxt"><i class="fa fa-spinner fa-spin"></i>  Loading</button>
                 </div>
             </div>
         </div>
@@ -132,8 +133,9 @@
                   </div>
                 </div>
                 <div class="row btn_area">
-                    <button class="button_form_style button_space_right" onclick="showHomeContent()"><i class="fa fa-home"></i> Home</button>
+                    <button class="button_form_style button_space_right" id="home_btn_extracttxt" onclick="showHomeContent()"><i class="fa fa-home"></i> Home</button>
                     <button class="button_form_style" id="extract_txt_action"><i class="fas fa-file-export"></i> Estrai testo nascosto</button>
+                    <button class="button_load single_button_form_popup" id="loading_btn_extracttxt"><i class="fa fa-spinner fa-spin"></i>Loading</button>
                 </div>
             </div>
         </div>

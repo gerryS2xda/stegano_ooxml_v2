@@ -1,8 +1,6 @@
 import socketserver
 import cgi
-import os
-import sys
-import time
+import json
 from http.server import SimpleHTTPRequestHandler
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
@@ -19,6 +17,13 @@ OUTPUT_STEGO_DIRECTORY = "./backend/output_stego"
 
 # Classe che riceverà e risponderà alla richieste HTTP
 class MyHttpRequestHandlerServer(SimpleHTTPRequestHandler):
+
+    # Set header for a JSON Response
+    def _set_json_response_header(self):
+        self.send_response(200)
+        self.send_header("Content-type", "application/json")
+        self.end_headers()
+
     # Implementazione del metodo che risponde alle richieste GET
     def do_GET(self):
 
@@ -26,38 +31,7 @@ class MyHttpRequestHandlerServer(SimpleHTTPRequestHandler):
         if self.path == "/":
             self.path = "/frontend/index.html"
 
-        """
-        controller_type = self.path.split('?')[0]
 
-        # Encoder controller
-        if controller_type == "/encoder-controller":
-            # Estrai i parametri della richiesta dall'url
-            params = parse_qs(urlparse(self.path).query)
-            print(params) # {'action': ['hideText'], 'coverfile': ['{}'], 'secretText': ['HelloWorld'], 'passwordEnc': ['123ad']}
-            #action = params["action"][0]
-            self.send_response(200)
-            self.end_headers()
-        """
-
-        """
-        # Specifica codice di risposta
-        self.send_response(301)
-        self.send_header('Location', self.path)
-        self.end_headers()
-
-        
-        print(self.path)
-        
-        # Costruzione risposta da inviare
-        #message = "Hello World"
-        #self.wfile.write(bytes(message, "utf8"))
-        
-            self.wfile.write(bytes("<html><head><title>https://pythonbasics.org</title></head>", "utf-8"))
-            self.wfile.write(bytes("<p>Request: %s</p>" % self.path, "utf-8"))
-            self.wfile.write(bytes("<body>", "utf-8"))
-            self.wfile.write(bytes("<p>This is an example web server.</p>", "utf-8"))
-            self.wfile.write(bytes("</body></html>", "utf-8"))
-        """
         return SimpleHTTPRequestHandler.do_GET(self)
 
     def do_POST(self):
@@ -88,15 +62,13 @@ class MyHttpRequestHandlerServer(SimpleHTTPRequestHandler):
                 # Run encoder
                 esito_op = split_method_stegano.run_encoder(cover_filename, secret_text, password_enc)
                 if not esito_op: # se l'operazione è fallita
-                    print("Operazione fallita")
+                    self._set_json_response_header()
+                    self.wfile.write(bytes(json.dumps({"success": "false"}), "utf8"))
                 else:
-                    print("Operazione eseguita correttamente")
+                    self._set_json_response_header()
+                    self.wfile.write(bytes(json.dumps({"success": "true"}), "utf8"))
 
-
-            self.send_response(200)
-            self.end_headers()
-
-        return SimpleHTTPRequestHandler.do_GET(self)
+        return
 
 # Avvio e stop del server
 if __name__ == "__main__":
