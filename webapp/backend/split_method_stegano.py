@@ -20,13 +20,13 @@ def run_encoder(input_file_name, message, password):
     path_input_file = INPUT_FILES_DIR + "/" + input_file_name
     if not os.path.exists(path_input_file):
         print("Il nome del file inserito non è presente")
-        return False
+        return False, ""
 
     # Check correct extension of input file
     input_file_extension = os.path.splitext(path_input_file)[1]  # Es. ".docx"
     if not utils.check_correct_extension_inputfile_webapp(input_file_extension):
         print("Tipo di file sconosciuto!! Richiesto file \".docx, .pptx, .xlsx\"")
-        return False
+        return False, ""
 
     # Extract file in working folder
     utils.extract_ooxml_input_file_in_working_directory(WORKING_DIRECTORY_PATH, path_input_file, input_file_name)
@@ -36,15 +36,16 @@ def run_encoder(input_file_name, message, password):
 
     # Select type of encoding by type of input file (i.e. fname.docx -> use encoder for docx)
     path_file_extracted = WORKING_DIRECTORY_PATH + "/" + input_file_name + "/file_extracted"
+    path_output_stego_file = ""
     if input_file_extension == ".docx":
         print("Esecuzione text split method per un documento Word...")
-        encoderWR.encoding(message, password, path_file_extracted, OUTPUT_STEGO_DIRECTORY)
+        path_output_stego_file = encoderWR.encoding(message, password, path_file_extracted, OUTPUT_STEGO_DIRECTORY)
     elif input_file_extension == ".pptx":
         print("Esecuzione text split method per una presentazione PowerPoint...")
-        encoderPP.encoding(message, password, path_file_extracted, OUTPUT_STEGO_DIRECTORY)
+        path_output_stego_file = encoderPP.encoding(message, password, path_file_extracted, OUTPUT_STEGO_DIRECTORY)
     elif input_file_extension == ".xlsx":
         print("Esecuzione text split method per una cartella di fogli di lavoro Excel...")
-        encoderEX.encoding(message, password, path_file_extracted, OUTPUT_STEGO_DIRECTORY)
+        path_output_stego_file = encoderEX.encoding(message, password, path_file_extracted, OUTPUT_STEGO_DIRECTORY)
 
     # Stop execution time and print
     execution_time = time.time() - start_time
@@ -53,7 +54,7 @@ def run_encoder(input_file_name, message, password):
     # Remove input file folder with extracted file from "working_directory"
     utils.remove_directory(WORKING_DIRECTORY_PATH + "/" + input_file_name)
 
-    return True
+    return True, path_output_stego_file
 
 def run_decoder(input_stegofile_name, password_dec):
 

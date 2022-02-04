@@ -81,6 +81,10 @@ body {
     height: 50%;
 }
 
+.hidden_info_content{
+    display: none;
+}
+
 /* Encoder/Decoder styles */
 #encoder_area_container{
     width: 100%;

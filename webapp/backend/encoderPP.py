@@ -147,6 +147,9 @@ def createFileStego(path_file_extracted, output_stego_directory_path):
     os.rename(output_stego_directory_path + '/stego.zip', output_stego_directory_path + '/' + input_file_name + '_stego.pptx')
     shutil.rmtree(output_stego_directory_path + '/file_extracted')
 
+    path_output_stego_file = output_stego_directory_path + '/' + input_file_name + '_stego.pptx'
+    return path_output_stego_file
+
 # Applicazione del metodo dello split in cui si incapsula il testo segreto in binario in una slide usando paragrafo e run element
 def encoding(message, password, path_file_extracted, output_stego_directory_path):
     # Step 1 -> Cifra il testo segreto H mediante l’algoritmo AES-CBC, usando la chiave simmetrica
@@ -285,7 +288,6 @@ def encoding(message, password, path_file_extracted, output_stego_directory_path
     print("directory \"slides\" statistics: <a:t> di base: " + count_txt_tag_base.__str__() + "; dopo: " + count_txt_tag.__str__())
 
     # Crea il file ".pptx" contenente il testo segreto
-    createFileStego(path_file_extracted, output_stego_directory_path)
+    path_output_stego_file = createFileStego(path_file_extracted, output_stego_directory_path)
     print("Il file .pptx steganografato è stato salvato nella directory \"" + output_stego_directory_path + "\"")
-
-
+    return path_output_stego_file

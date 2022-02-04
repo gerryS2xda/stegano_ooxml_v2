@@ -60,13 +60,13 @@ class MyHttpRequestHandlerServer(SimpleHTTPRequestHandler):
                 password_enc = form.getvalue("passwordEnc")
 
                 # Run encoder
-                esito_op = split_method_stegano.run_encoder(cover_filename, secret_text, password_enc)
+                esito_op, path_output_stego_file = split_method_stegano.run_encoder(cover_filename, secret_text, password_enc)
                 if not esito_op: # se l'operazione è fallita
                     self._set_json_response_header()
                     self.wfile.write(bytes(json.dumps({"success": "false"}), "utf8"))
                 else:
                     self._set_json_response_header()
-                    self.wfile.write(bytes(json.dumps({"success": "true"}), "utf8"))
+                    self.wfile.write(bytes(json.dumps({"success": "true", "path_stego_file": path_output_stego_file}), "utf8"))
 
         return
 

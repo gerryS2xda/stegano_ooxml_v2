@@ -54,27 +54,31 @@ $("#hide_txt_action").click(function(){ //pulsante "Nascondi testo"
         processData: false,
         success: function(result,status,xhr){
             if(xhr.readyState == 4 & status == "success"){
-                alert(result["success"]);
                 if(result["success"] === "true"){
+                    //Scrivi da qualche parte il path del file steganografato da scaricare
+                    $("#path_stego_file_to_download").text(result["path_stego_file"])
+
                     //Mostra popup successo operazione
                     $("#content_popup_downstego").show();
                     $("#content_popup_downstego").addClass("popup_body");
 
                     //Rimuovi pulsante "loading"
-                    $("#loading_btn_hidetxt").hide();
-                    $("#home_btn_hidetext").show();
-                    $("#hide_txt_action").show();
+                    removeLoadingBtnHideText();
 
                     return;
                 }
                 return;
             }
-            showPopupHideTextError();
+            error_msg = "Impossibile completare l'operazione! Non vi è abbastanza capacità di inclusione per nascondere un testo!!"
+            showPopupHideTextError(error_msg);
         },
     });
 });
 
-function showPopupHideTextError(){
+function showPopupHideTextError(error_msg){
+    //Imposta messaggio di errore da mostrare
+    $("#p_popup_hidetext_err").text(error_msg)
+
     //Mostra popup operazione fallita
     $("#content_popup_error_hidetext").show();
     $("#content_popup_error_hidetext").addClass("popup_body");
@@ -90,10 +94,58 @@ $("#cancel_download_stego_action").click(function(){ //pulsante "Annulla" del po
 
 $("#download_stego_action").click(function(){ //pulsante "Download stego file"
 
-    //Richiesta http
+    // Get path of file to download and fix path
+    stego_file_path = $("#path_stego_file_to_download").text();
+    if(stego_file_path[0] === "." && stego_file_path[1] === "."){
+        stego_file_path = stego_file_path.substring(2)
+    }else if(stego_file_path[0] === "."){
+        stego_file_path = stego_file_path.substring(1)
+    }
 
-    //Rimuovi popup al termine dell'operazione
-    removePopupDownloadStego();
+    //Send POST Http request for download a file
+    $.ajax({
+        url: stego_file_path,
+        cache: false,
+        xhr: function () {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 2) {
+                    if (xhr.status == 200) {
+                        xhr.responseType = "blob";
+                    } else {
+                        xhr.responseType = "text";
+                    }
+                }
+            };
+            return xhr;
+        },
+        success: function (data, status, xhr) {
+            if(xhr.readyState == 4 & status == "success"){
+                //Convert the Byte Data to BLOB object.
+                var blob = new Blob([data], { type: "application/octetstream" });
+                fileName = "sample.docx" //DA SISTEMAREEEEE
+                //Check the Browser type and download the File.
+                var isIE = false || !!document.documentMode;
+                if (isIE) {
+                    window.navigator.msSaveBlob(blob, fileName);
+                } else {
+                    var url = window.URL || window.webkitURL;
+                    link = url.createObjectURL(blob);
+                    var a = $("<a />");
+                    a.attr("download", fileName);
+                    a.attr("href", link);
+                    a.attr("id", "link_fittizio")
+                    $("body").append(a);
+                    a[0].click();
+                    $("#link_fittizio").remove();
+                    //$("body").remove(a);
+                }
+                removePopupDownloadStego();
+                return;
+            }
+            showPopupHideTextError();
+        }
+    });
 });
 
 function removePopupDownloadStego(){
@@ -106,6 +158,11 @@ function removePopupErrorHideText(){
     $("#content_popup_error_hidetext").hide();
 }
 
+function removeLoadingBtnHideText(){
+    $("#loading_btn_hidetxt").hide();
+    $("#home_btn_hidetext").show();
+    $("#hide_txt_action").show();
+}
 
 //funzioni per pulsanti "Decoder Area"
 $("#extract_txt_action").click(function(){ //pulsante "Estrai testo nascosto"
@@ -125,13 +182,11 @@ $("#extract_txt_action").click(function(){ //pulsante "Estrai testo nascosto"
     $("#content_popup_extracttext").addClass("popup_body");
 
     //Rimuovi pulsante "loading"
-    $("#loading_btn_extracttxt").hide();
-    $("#home_btn_extracttxt").show();
-    $("#extract_txt_action").show();
+    removeLoadingBtnExtractText();
 
     //Mostra popup operazione fallita
-    //$("#content_popup_error_extracttext").show();
-    //$("#content_popup_error_extracttext").addClass("popup_body");
+    //error_msg = "Impossibile completare l'operazione! Password errata o testo segreto non presente!";
+    //showPopupExtractTextError(error_msg);
 
     //Al termine dell'operazione, vai alla home
     //showHomeContent();
@@ -142,6 +197,18 @@ $("#ok_extracted_text_btn").click(function(){ //pulsante "Ok" del popup "Estrai 
     showHomeContent();
 });
 
+function showPopupExtractTextError(error_msg){
+    //Imposta messaggio di errore da mostrare
+    $("#p_popup_extracttext_err").text(error_msg)
+
+    //Mostra popup operazione fallita
+    $("#content_popup_error_extracttext").show();
+    $("#content_popup_error_extracttext").addClass("popup_body");
+
+    //Rimuovi pulsante "loading"
+    removeLoadingBtnExtractText();
+}
+
 function removePopupExtractText(){
     $("#content_popup_extracttext").removeClass("popup_body");
     $("#content_popup_extracttext").hide();
@@ -150,4 +217,10 @@ function removePopupExtractText(){
 function removePopupErrorExtractText(){
     $("#content_popup_error_extracttext").removeClass("popup_body");
     $("#content_popup_error_extracttext").hide();
+}
+
+function removeLoadingBtnExtractText(){
+    $("#loading_btn_extracttxt").hide();
+    $("#home_btn_extracttxt").show();
+    $("#extract_txt_action").show();
 }

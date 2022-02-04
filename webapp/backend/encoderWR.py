@@ -135,6 +135,9 @@ def createFileStego(tree, path_file_extracted, output_stego_directory_path):
     os.remove(output_stego_directory_path + '/document.xml')
     shutil.rmtree(output_stego_directory_path + '/file_extracted')
 
+    path_output_stego_file = output_stego_directory_path + '/' + input_file_name + '_stego.docx'
+    return path_output_stego_file
+
 # Applicazione del metodo dello split in cui si incapsula il testo segreto in binario nel "document.xml" usando paragrafo e run element
 def encoding(message, password, path_file_extracted, output_stego_directory_path):
     # step 1 -> Leggi il codice dal file "document.xml", relativo al documento D
@@ -258,7 +261,8 @@ def encoding(message, password, path_file_extracted, output_stego_directory_path
     print("document.xml statistics: <w:t> di base: " + count_txt_tag_base.__str__() + "; dopo: " + count_txt_tag.__str__())
 
     # Crea il file steganografato
-    createFileStego(tree, path_file_extracted, output_stego_directory_path)
-    print("il file .docx steganografato è stato salvato nella directory \""+ output_stego_directory_path + "\"")
+    path_output_stego_file = createFileStego(tree, path_file_extracted, output_stego_directory_path)
+    print("il file .docx steganografato è stato salvato nella directory \"" + output_stego_directory_path + "\"")
+    return path_output_stego_file
 
 

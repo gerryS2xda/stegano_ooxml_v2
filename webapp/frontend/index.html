@@ -36,16 +36,17 @@
                     <h1>Nascondi un testo</h1>
                     <p class="p_popup_label_center">Il testo è stato nascosto o incapsulato con successo nel cover file!!</p>
                     <div class="content_pop_button_area">
-                       <!-- <button class="button_form_popup_style button_space_right_popup" id="cancel_download_stego_action"><i class="fa fa-close"></i> Annulla</button>-->
+                        <!-- <button class="button_form_popup_style button_space_right_popup" id="cancel_download_stego_action"><i class="fa fa-close"></i> Annulla</button>-->
                         <button class="button_form_popup_style single_button_form_popup" id="download_stego_action"><i class="fas fa-file-download"></i> Download stego file</button>
                     </div>
+                    <span class="hidden_info_content" id="path_stego_file_to_download"></span>
                 </div>
             </div>
         </div>
         <div id="content_popup_error_hidetext">
             <div id="content_popup_error_hidetext_area">
                 <h1>Nascondi un testo</h1>
-                <p class="p_popup_label_center_err">Impossibile completare l'operazione! Non vi è abbastanza capacità di inclusione per nascondere un testo!!</p>
+                <p class="p_popup_label_center_err" id="p_popup_hidetext_err"></p>
                 <div class="content_pop_button_area">
                     <button class="button_form_popup_style single_button_form_popup" onclick="removePopupErrorHideText();">Riprova</button>
                 </div>
@@ -106,7 +107,7 @@
         <div id="content_popup_error_extracttext">
             <div id="content_popup_error_extracttext_area">
                 <h1>Estrazione testo nascosto</h1>
-                <p class="p_popup_label_center_err">Impossibile completare l'operazione! Password errata o testo segreto non presente!</p>
+                <p class="p_popup_label_center_err" id="p_popup_extracttext_err"></p>
                 <div class="content_pop_button_area">
                     <button class="button_form_popup_style single_button_form_popup" onclick="removePopupErrorHideText();">Riprova</button>
                 </div>

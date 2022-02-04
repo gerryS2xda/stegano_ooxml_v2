@@ -137,6 +137,8 @@ def createFileStego(tree, path_file_extracted, output_stego_directory_path):
     os.remove(output_stego_directory_path + '/sharedStrings.xml')
     shutil.rmtree(output_stego_directory_path + '/file_extracted')
 
+    path_output_stego_file = output_stego_directory_path + '/' + input_file_name + '_stego.xlsx'
+    return path_output_stego_file
 
 # Applicazione del metodo dello split in cui si incapsula il testo segreto in binario in "sharedStrings.xml" usando string item e run element
 def encoding(message, password, path_file_extracted, output_stego_directory_path):
@@ -283,5 +285,6 @@ def encoding(message, password, path_file_extracted, output_stego_directory_path
     tree_sst = impercettibilityEX.apply_cell_styles_into_sst(path_file_extracted, tree_sst)
 
     # Crea il file steganografato
-    createFileStego(tree_sst, path_file_extracted, output_stego_directory_path)
+    path_output_stego_file = createFileStego(tree_sst, path_file_extracted, output_stego_directory_path)
     print("Il file .xlsx steganografato è stato salvato nella directory \"" + output_stego_directory_path + "\"")
+    return path_output_stego_file
