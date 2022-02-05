@@ -2,7 +2,6 @@ import os
 import shutil
 import zipfile
 import sys
-from distutils.dir_util import copy_tree
 from lxml import etree
 import copy
 from webapp.backend import utils
@@ -118,7 +117,7 @@ def check_if_available_space(index, string_item, information_to_encode_bits, off
 def createFileStego(tree, path_file_extracted, output_stego_directory_path):
     input_file_name = os.path.splitext(os.path.split(os.path.split(path_file_extracted)[0])[1])[0]  # no estensione file
     tree.write(output_stego_directory_path + "/sharedStrings.xml")
-    copy_tree(path_file_extracted, output_stego_directory_path + "/file_extracted")
+    shutil.copytree(path_file_extracted, output_stego_directory_path + "/file_extracted")
     shutil.copy(output_stego_directory_path + "/sharedStrings.xml", output_stego_directory_path + "/file_extracted/xl")
     zf = zipfile.ZipFile(output_stego_directory_path + "/stego.zip", "w", zipfile.ZIP_DEFLATED)
     for dirname, subdirs, files in os.walk(output_stego_directory_path + "/file_extracted"):

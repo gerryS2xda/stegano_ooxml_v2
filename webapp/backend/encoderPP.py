@@ -2,7 +2,6 @@ import os
 import shutil
 import zipfile
 import sys
-from distutils.dir_util import copy_tree
 from lxml import etree
 import copy 
 import random
@@ -170,7 +169,7 @@ def encoding(message, password, path_file_extracted, output_stego_directory_path
     # Inizializza il file .pptx steganografato copiando il contenuto originale in "stego/file_extracted"
     if os.path.exists("stego/file_extracted"):
         shutil.rmtree('./stego/file_extracted')
-    copy_tree(path_file_extracted, "stego/file_extracted")
+    shutil.copytree(path_file_extracted, "stego/file_extracted")
 
     # Step 3 -> Per ciascuna slide presente nella directory "ppt/slides" della presentazione D
     slides = os.listdir(path_file_extracted + "/ppt/slides")
