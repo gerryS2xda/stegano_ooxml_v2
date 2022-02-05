@@ -217,7 +217,10 @@ $("#extract_txt_action").click(function(){ //pulsante "Estrai testo nascosto"
             if(xhr.readyState == 4 & status == "success"){
                 if(result["success"] === "true"){
                     //Scrivi nella textarea il testo estratto
-                    $("#extract_text_textarea").text(result["extract_txt"])
+                    $("#extract_text_textarea").text(result["extract_txt"]);
+
+                    //Scrivi il numero di volte in cui viene estratto lo stesso testo
+                    $("#num_rip_txt_segreto").text(result["count_repeat_same_secret_txt"]);
 
                     //Mostra popup successo operazione
                     $("#content_popup_extracttext").show();

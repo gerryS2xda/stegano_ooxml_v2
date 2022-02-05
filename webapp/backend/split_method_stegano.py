@@ -62,13 +62,13 @@ def run_decoder(input_stegofile_name, password_dec):
     path_input_file = INPUT_FILES_DIR + "/" + input_stegofile_name
     if not os.path.exists(path_input_file):
         print("Il nome del file steganografato inserito non è presente")
-        return False, ""
+        return False, "", 0
 
     # Check correct extension of input file
     input_file_extension = os.path.splitext(path_input_file)[1]  # Es. ".docx"
     if not utils.check_correct_extension_inputfile_webapp(input_file_extension):
         print("Tipo di file sconosciuto!! Richiesto file \".docx, .pptx, .xlsx\"")
-        return False, ""
+        return False, "", 0
 
     # Extract file in working folder
     utils.extract_ooxml_input_file_in_working_directory(WORKING_DIRECTORY_PATH, path_input_file, input_stegofile_name)
@@ -76,20 +76,21 @@ def run_decoder(input_stegofile_name, password_dec):
     # Init start execution time
     start_time = time.time()
 
-    # Message to extract
+    # Message to extract and repeat same message
     message = ""
+    count_repeat_message = 0
 
     # Select type of decoding by type of input file (i.e. fname.docx -> use decoder for docx)
     path_file_extracted = WORKING_DIRECTORY_PATH + "/" + input_stegofile_name + "/file_extracted"
     if input_file_extension == ".docx":
         print("Esecuzione text split method per estrazione di un testo segreto da un documento Word...")
-        message = decoderWR.decoding(password_dec, path_file_extracted)
+        message, count_repeat_message = decoderWR.decoding(password_dec, path_file_extracted)
     elif input_file_extension == ".pptx":
         print("Esecuzione text split method per estrazione di un testo segreto da una presentazione PowerPoint...")
-        message = decoderPP.decoding(password_dec, path_file_extracted)
+        message, count_repeat_message = decoderPP.decoding(password_dec, path_file_extracted)
     elif input_file_extension == ".xlsx":
         print("Esecuzione text split method per per estrazione di un testo segreto da cartella di fogli di lavoro Excel...")
-        message = decoderEX.decoding(password_dec, path_file_extracted)
+        message, count_repeat_message = decoderEX.decoding(password_dec, path_file_extracted)
 
     # Stop execution time and print
     execution_time = time.time() - start_time
@@ -98,4 +99,4 @@ def run_decoder(input_stegofile_name, password_dec):
     # Remove input file folder with extracted file from "working_directory"
     utils.remove_directory(WORKING_DIRECTORY_PATH + "/" + input_stegofile_name)
 
-    return True, message
+    return True, message, count_repeat_message

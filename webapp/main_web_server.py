@@ -85,14 +85,14 @@ class MyHttpRequestHandlerServer(SimpleHTTPRequestHandler):
                 password_dec = form.getvalue("passwordDec")
 
                 # Run decoder
-                esito_op, text_extracted = split_method_stegano.run_decoder(stego_filename, password_dec)
+                esito_op, text_extracted, count_repeat_message = split_method_stegano.run_decoder(stego_filename, password_dec)
                 if not esito_op:  # se l'operazione è fallita
                     self._set_json_response_header()
                     self.wfile.write(bytes(json.dumps({"success": "false"}), "utf8"))
                 else:
                     self._set_json_response_header()
                     self.wfile.write(
-                        bytes(json.dumps({"success": "true", "extract_txt": text_extracted}), "utf8"))
+                        bytes(json.dumps({"success": "true", "extract_txt": text_extracted, "count_repeat_same_secret_txt": count_repeat_message}), "utf8"))
 
         return
 
