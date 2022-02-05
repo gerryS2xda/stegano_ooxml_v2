@@ -48,6 +48,10 @@ body {
     align-items: center;
 }
 
+#encoder_area_container, #decoder_area_container{
+    display: none;
+}
+
 #encoder_image_select_container, #decoder_image_select_container{
     float: inherit;
     width: 50%;
@@ -108,11 +112,26 @@ input[type=text], input[type=file], select, textarea{
   font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
+.input_field_err{
+    border-color: red;
+    border-width: medium;
+}
+
+#p_form_hidetext_field_err, #p_form_extracttext_field_err{
+    display: none;
+}
+
 /* Style the label to display next to the inputs */
 label {
   padding: 12px 12px 12px 0;
   display: inline-block;
   font-size: 18px;
+}
+
+.p_form_field_err{
+  display: inline-block;
+  font-size: 18px;
+  color: red;
 }
 
 /* Style the submit button */

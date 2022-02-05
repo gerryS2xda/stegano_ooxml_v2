@@ -32,6 +32,12 @@ function showHomeContent(){ //pulsante "Home"
 
 //funzioni per pulsanti "Encoder Area"
 $("#hide_txt_action").click(function(){ //pulsante "Nascondi testo"
+    //Prima di eseguire, verifica che tutti i campi del form sono riempiti
+    if(!formHideTextValidation()){
+        alert("Ci sono uno o più campi obbligatori che devono essere completati!!");
+        return;
+    }
+
     //Aggiorna il pulsante con pulsante "Loading..."
     $("#home_btn_hidetext").hide();
     $("#hide_txt_action").hide();
@@ -55,6 +61,7 @@ $("#hide_txt_action").click(function(){ //pulsante "Nascondi testo"
         contentType: false,
         processData: false,
         success: function(result,status,xhr){
+            error_msg = "";
             if(xhr.readyState == 4 & status == "success"){
                 if(result["success"] === "true"){
                     //Scrivi da qualche parte il path del file steganografato da scaricare
@@ -66,13 +73,17 @@ $("#hide_txt_action").click(function(){ //pulsante "Nascondi testo"
 
                     //Rimuovi pulsante "loading"
                     removeLoadingBtnHideText();
-
+                    resetFormHideText();
                     return;
                 }
-                return;
+                error_msg = "Impossibile completare l'operazione! Non vi è abbastanza capacità di inclusione per nascondere un testo!!";
+            }else{
+                error_msg = "Impossibile completare l'operazione! Errore da parte del server!!";
             }
-            error_msg = "Impossibile completare l'operazione! Non vi è abbastanza capacità di inclusione per nascondere un testo!!"
+            //Mostra popup di errore, rimuovi pulsante "Loading" e resetta i campi del form
             showPopupHideTextError(error_msg);
+            removeLoadingBtnHideText();
+            resetFormHideText();
         },
     });
 });
@@ -84,10 +95,6 @@ function showPopupHideTextError(error_msg){
     //Mostra popup operazione fallita
     $("#content_popup_error_hidetext").show();
     $("#content_popup_error_hidetext").addClass("popup_body");
-
-    //Rimuovi pulsante "loading"
-    $("#hide_txt_action").show();
-    $("#loading_btn_hidetxt").hide();
 }
 
 $("#cancel_download_stego_action").click(function(){ //pulsante "Annulla" del popup "Download stego file"
@@ -150,7 +157,8 @@ $("#download_stego_action").click(function(){ //pulsante "Download stego file"
                 showHomeContent(); //ritorna alla home
                 return;
             }
-            showPopupHideTextError();
+            error_msg = "Impossibile completare l'operazione! Errore da parte del server!!";
+            showPopupHideTextError(error_msg);
         }
     });
 });
@@ -171,8 +179,20 @@ function removeLoadingBtnHideText(){
     $("#hide_txt_action").show();
 }
 
+function resetFormHideText(){
+    $("#upload_cover_file").val("");
+    $("#secret_text").val("");
+    $("#password_encrypt").val("");
+}
+
 //funzioni per pulsanti "Decoder Area"
 $("#extract_txt_action").click(function(){ //pulsante "Estrai testo nascosto"
+    //Prima di eseguire, verifica che tutti i campi del form sono riempiti
+    if(!formExtractTextValidation()){
+        alert("Ci sono uno o più campi obbligatori che devono essere completati!!");
+        return;
+    }
+
     //Aggiorna il pulsante con pulsante "Loading..."
     $("#home_btn_extracttxt").hide();
     $("#extract_txt_action").hide();
@@ -205,13 +225,17 @@ $("#extract_txt_action").click(function(){ //pulsante "Estrai testo nascosto"
 
                     //Rimuovi pulsante "loading"
                     removeLoadingBtnExtractText();
-
+                    resetFormExtractText();
                     return;
                 }
-                return;
+                error_msg = "Impossibile completare l'operazione! Password errata o testo segreto non presente!";
+            }else{
+                error_msg = "Impossibile completare l'operazione! Errore da parte del server!!";
             }
-            error_msg = "Impossibile completare l'operazione! Password errata o testo segreto non presente!";
+            //Mostra popup di errore, rimuovi pulsante "Loading" e resetta i campi del form
             showPopupExtractTextError(error_msg);
+            removeLoadingBtnExtractText();
+            resetFormExtractText();
         },
     });
 });
@@ -228,9 +252,6 @@ function showPopupExtractTextError(error_msg){
     //Mostra popup operazione fallita
     $("#content_popup_error_extracttext").show();
     $("#content_popup_error_extracttext").addClass("popup_body");
-
-    //Rimuovi pulsante "loading"
-    removeLoadingBtnExtractText();
 }
 
 function removePopupExtractText(){
@@ -247,4 +268,107 @@ function removeLoadingBtnExtractText(){
     $("#loading_btn_extracttxt").hide();
     $("#home_btn_extracttxt").show();
     $("#extract_txt_action").show();
+}
+
+function resetFormExtractText(){
+    $("#upload_stego_file").val("");
+    $("#password_decrypt").val("");
+}
+
+//Funzioni per la validazione dei campi dei form
+function validateUploadCoverFileField(item){
+    var x = item.val();
+    var esito = true;
+    if(x === ""){ //campo vuoto
+        $("#p_form_hidetext_field_err").show();
+        item.css("border","3px solid red");
+        esito = false;
+    }else{
+        $("#p_form_hidetext_field_err").hide();
+        item.css("border", "1px solid #ccc");
+    }
+
+    return esito;
+}
+
+function validateSecretTextField(item){
+    var x = item.val();
+    var esito = true;
+    if(x === ""){ //campo vuoto
+        $("#p_form_hidetext_field_err").show();
+        item.css("border","3px solid red");
+        esito = false;
+    }else{
+        $("#p_form_hidetext_field_err").hide();
+        item.css("border", "1px solid #ccc");
+    }
+
+    return esito;
+}
+
+function validatePasswordEncryptField(item){
+    var x = item.val();
+    var esito = true;
+    if(x === ""){ //campo vuoto
+        $("#p_form_hidetext_field_err").show();
+        item.css("border","3px solid red");
+        esito = false;
+    }else{
+        $("#p_form_hidetext_field_err").hide();
+        item.css("border", "1px solid #ccc");
+    }
+
+    return esito;
+}
+
+function validateUploadStegoFileField(item){
+    var x = item.val();
+    var esito = true;
+    if(x === ""){ //campo vuoto
+        $("#p_form_extracttext_field_err").show();
+        item.css("border","3px solid red");
+        esito = false;
+    }else{
+        $("#p_form_extracttext_field_err").hide();
+        item.css("border", "1px solid #ccc");
+    }
+
+    return esito;
+}
+
+function validatePasswordDecryptField(item){
+    var x = item.val();
+    var esito = true;
+    if(x === ""){ //campo vuoto
+        $("#p_form_extracttext_field_err").show();
+        item.css("border","3px solid red");
+        esito = false;
+    }else{
+        $("#p_form_extracttext_field_err").hide();
+        item.css("border", "1px solid #ccc");
+    }
+
+    return esito;
+}
+
+function formHideTextValidation(){
+    var esito = false;
+    if(validateUploadCoverFileField($("#upload_cover_file"))){
+        if(validateSecretTextField($("#secret_text"))){
+            if(validatePasswordEncryptField($("#password_encrypt"))){
+                esito = true;
+            }
+        }
+    }
+    return esito;
+}
+
+function formExtractTextValidation(){
+    var esito = false;
+    if(validateUploadStegoFileField($("#upload_stego_file"))){
+        if(validatePasswordDecryptField($("#password_decrypt"))){
+            esito = true;
+        }
+    }
+    return esito;
 }
