@@ -47,7 +47,6 @@ class MyHttpRequestHandlerServer(SimpleHTTPRequestHandler):
                          'CONTENT_TYPE': self.headers['Content-Type'],
                          })
             action = form.getvalue("action")
-            print(action)
             if action == "hideText":
                 # Get uploaded file from POST request and put it in "working_directory" folder
                 cover_filename = form["coverfile"].filename
@@ -67,13 +66,39 @@ class MyHttpRequestHandlerServer(SimpleHTTPRequestHandler):
                 else:
                     self._set_json_response_header()
                     self.wfile.write(bytes(json.dumps({"success": "true", "path_stego_file": path_output_stego_file}), "utf8"))
+        elif controller_type == "/decoder-controller":
+            # Estrai i parametri della richiesta POST
+            form = cgi.FieldStorage(
+                fp=self.rfile,
+                headers=self.headers,
+                environ={'REQUEST_METHOD': 'POST',
+                         'CONTENT_TYPE': self.headers['Content-Type'],
+                         })
+            action = form.getvalue("action")
+            if action == "extractTxt":
+                # Get uploaded file from POST request and put it in "working_directory" folder
+                stego_filename = form["stegofile"].filename
+                stego_file = form["stegofile"].file.read()
+                open(INPUT_FILES_DIR + "/" + stego_filename, "wb").write(stego_file)
+
+                # Get password to decrypt extracted text
+                password_dec = form.getvalue("passwordDec")
+
+                # Run decoder
+                esito_op, text_extracted = split_method_stegano.run_decoder(stego_filename, password_dec)
+                if not esito_op:  # se l'operazione è fallita
+                    self._set_json_response_header()
+                    self.wfile.write(bytes(json.dumps({"success": "false"}), "utf8"))
+                else:
+                    self._set_json_response_header()
+                    self.wfile.write(
+                        bytes(json.dumps({"success": "true", "extract_txt": text_extracted}), "utf8"))
 
         return
 
 # Avvio e stop del server
 if __name__ == "__main__":
     print("Avvio del server...")
-    #webServer = HTTPServer((hostName, serverPort), MyHttpRequestHandlerServer)
     webServer = socketserver.TCPServer((hostName, serverPort), MyHttpRequestHandlerServer)
     print("Server started: http://%s:%s" % (hostName, serverPort))
     print("Server in esecuzione...")

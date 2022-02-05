@@ -15,11 +15,13 @@ function hideAllContent(){
 $("#encoder_image_button").click(function(){
     hideAllContent();
     $("#encoder_area_container").show();
+    $("#path_stego_file_to_download").text(""); //reset hidden path
 });
 
 $("#decoder_image_button").click(function(){
     hideAllContent();
     $("#decoder_area_container").show();
+    $("#extract_text_textarea").text(""); //reset textarea popup
 });
 
 //funzioni per pulsanti
@@ -145,6 +147,7 @@ $("#download_stego_action").click(function(){ //pulsante "Download stego file"
                     //$("body").remove(a);
                 }
                 removePopupDownloadStego();
+                showHomeContent(); //ritorna alla home
                 return;
             }
             showPopupHideTextError();
@@ -173,37 +176,54 @@ $("#extract_txt_action").click(function(){ //pulsante "Estrai testo nascosto"
     //Aggiorna il pulsante con pulsante "Loading..."
     $("#home_btn_extracttxt").hide();
     $("#extract_txt_action").hide();
-    $("#loading_btn_extracttxt").show();    //Aggiorna il pulsante con pulsante "Loading..."
+    $("#loading_btn_extracttxt").show();
 
-    //...richiesta servlet
+    // Send HTTP POST Request to server
     var stegofile = $("#upload_stego_file")[0].files[0]; //object file
     var password_dec = $("#password_decrypt").val(); //string
 
+    var fd = new FormData();
+    fd.append("action", "extractTxt");
+    fd.append("stegofile", stegofile);
+    fd.append("passwordDec", password_dec);
 
+    $.ajax({
+        url: 'decoder-controller',
+        type: 'POST',
+        data: fd,
+        contentType: false,
+        processData: false,
+        success: function(result,status,xhr){
+            if(xhr.readyState == 4 & status == "success"){
+                if(result["success"] === "true"){
+                    //Scrivi nella textarea il testo estratto
+                    $("#extract_text_textarea").text(result["extract_txt"])
 
-    //Mostra popup successo operazione
-    $("#content_popup_extracttext").show();
-    $("#content_popup_extracttext").addClass("popup_body");
+                    //Mostra popup successo operazione
+                    $("#content_popup_extracttext").show();
+                    $("#content_popup_extracttext").addClass("popup_body");
 
-    //Rimuovi pulsante "loading"
-    removeLoadingBtnExtractText();
+                    //Rimuovi pulsante "loading"
+                    removeLoadingBtnExtractText();
 
-    //Mostra popup operazione fallita
-    //error_msg = "Impossibile completare l'operazione! Password errata o testo segreto non presente!";
-    //showPopupExtractTextError(error_msg);
-
-    //Al termine dell'operazione, vai alla home
-    //showHomeContent();
+                    return;
+                }
+                return;
+            }
+            error_msg = "Impossibile completare l'operazione! Password errata o testo segreto non presente!";
+            showPopupExtractTextError(error_msg);
+        },
+    });
 });
 
 $("#ok_extracted_text_btn").click(function(){ //pulsante "Ok" del popup "Estrai testo nascosto"
-    removePopupExtractText()
+    removePopupExtractText();
     showHomeContent();
 });
 
 function showPopupExtractTextError(error_msg){
     //Imposta messaggio di errore da mostrare
-    $("#p_popup_extracttext_err").text(error_msg)
+    $("#p_popup_extracttext_err").text(error_msg);
 
     //Mostra popup operazione fallita
     $("#content_popup_error_extracttext").show();
