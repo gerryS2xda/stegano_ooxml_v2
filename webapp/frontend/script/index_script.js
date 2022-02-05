@@ -123,7 +123,11 @@ $("#download_stego_action").click(function(){ //pulsante "Download stego file"
             if(xhr.readyState == 4 & status == "success"){
                 //Convert the Byte Data to BLOB object.
                 var blob = new Blob([data], { type: "application/octetstream" });
-                fileName = "sample.docx" //DA SISTEMAREEEEE
+
+                //Get filename to download
+                fileName = $("#path_stego_file_to_download").text();
+                fileName = fileName.substring(fileName.lastIndexOf('/')+1);
+
                 //Check the Browser type and download the File.
                 var isIE = false || !!document.documentMode;
                 if (isIE) {
