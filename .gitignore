@@ -1,6 +1,6 @@
 #Project ignore file and directory
 /app/stego/
-/webapp/stego/
+/webapp/old_version/stego/
 
 # Default ignored files
 /shelf/
