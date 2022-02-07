@@ -2,7 +2,7 @@ import socketserver
 import cgi
 import json
 import os
-from http.server import SimpleHTTPRequestHandler
+from http.server import SimpleHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 from webapp.backend import split_method_stegano
@@ -100,7 +100,7 @@ class MyHttpRequestHandlerServer(SimpleHTTPRequestHandler):
 # Avvio e stop del server
 if __name__ == "__main__":
     print("Avvio del server...")
-    webServer = socketserver.TCPServer((hostName, serverPort), MyHttpRequestHandlerServer)
+    webServer = HTTPServer((hostName, serverPort), MyHttpRequestHandlerServer)
     print("Server started: http://%s:%s" % (hostName, serverPort))
     print("Server in esecuzione...")
 
