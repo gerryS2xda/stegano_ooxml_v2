@@ -3,8 +3,8 @@ from lxml import etree
 import copy
 from webapp.backend import utils
 
-# External XML file to load
-PRESET_TABLE_STYLE_XML_FILE_PATH = "./external_xml/presetTableStyles.xml"
+# External XML file to load (necessario path completo perche' os.cwd = "/webapp")
+PRESET_TABLE_STYLE_XML_FILE_PATH = "./backend/external_xml/presetTableStyles.xml"
 
 # Constant for XML SpreadSheetML element
 PREFIX_EXCEL_PROC = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"

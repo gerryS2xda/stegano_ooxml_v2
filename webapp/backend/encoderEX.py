@@ -255,7 +255,7 @@ def encoding(message, password, path_file_extracted, output_stego_directory_path
                     offset_run_elem += 1
                     if len(text[N:]) == 0: # anche se <t> è vuoto, il decoder lo ignora dall'estrazione
                         new_run_elem.find("./" + TEXT_TAG).text = ""
-                    # optimization -> remove tree.write("stego/document.xml")
+
                     N = 1
                     count_txt_tag += 1
                 i += 1

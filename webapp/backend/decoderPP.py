@@ -95,7 +95,7 @@ def decoding(password, path_file_extracted):
     count_repeat_text_secret = 0
     for p in split_duplicate:
         try:
-            message_extract += utils.decrypt(password, p) + "\n"
+            message_extract += utils.decrypt(password, p).decode("utf-8") + "\n"
             count_repeat_text_secret += 1
         except:
             print("Una duplicazione del testo segreto non può essere decifrata poichè incompleta --> " + p)

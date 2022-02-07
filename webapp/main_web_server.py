@@ -1,6 +1,7 @@
 import socketserver
 import cgi
 import json
+import os
 from http.server import SimpleHTTPRequestHandler
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
@@ -102,6 +103,14 @@ if __name__ == "__main__":
     webServer = socketserver.TCPServer((hostName, serverPort), MyHttpRequestHandlerServer)
     print("Server started: http://%s:%s" % (hostName, serverPort))
     print("Server in esecuzione...")
+
+    # Crea le directory di lavoro se non sono presenti
+    if not os.path.exists(INPUT_FILES_DIR):
+        os.mkdir(INPUT_FILES_DIR)
+    if not os.path.exists(WORKING_DIRECTORY_PATH):
+        os.mkdir(WORKING_DIRECTORY_PATH)
+    if not os.path.exists(OUTPUT_STEGO_DIRECTORY):
+        os.mkdir(OUTPUT_STEGO_DIRECTORY)
 
     try:
         webServer.serve_forever()

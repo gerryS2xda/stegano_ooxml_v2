@@ -121,7 +121,7 @@ def check_if_available_space(index, paragraph, information_to_encode_bits, offse
         return False
     return True
 
-# Crea il file "slideX.xml" steganografato e aggiungilo in "stego/file_extracted"
+# Crea il file "slideX.xml" steganografato e aggiungilo in "./backend/output_stego/file_extracted"
 def createSlideStego(tree, slide_filename, output_stego_directory_path):
     tree.write(output_stego_directory_path + "/" + slide_filename)
     shutil.copy(output_stego_directory_path + "/" + slide_filename, output_stego_directory_path + "/file_extracted/ppt/slides")
@@ -166,10 +166,10 @@ def encoding(message, password, path_file_extracted, output_stego_directory_path
     count_txt_tag_base = 0  # for testing
     count_txt_tag = 0  # for testing
 
-    # Inizializza il file .pptx steganografato copiando il contenuto originale in "stego/file_extracted"
-    if os.path.exists("stego/file_extracted"):
-        shutil.rmtree('./stego/file_extracted')
-    shutil.copytree(path_file_extracted, "stego/file_extracted")
+    # Inizializza il file .pptx steganografato copiando il contenuto originale in "./backend/output_stego/file_extracted"
+    if os.path.exists(output_stego_directory_path + "/file_extracted"):
+        shutil.rmtree(output_stego_directory_path + '/file_extracted')
+    shutil.copytree(path_file_extracted, output_stego_directory_path + "/file_extracted")
 
     # Step 3 -> Per ciascuna slide presente nella directory "ppt/slides" della presentazione D
     slides = os.listdir(path_file_extracted + "/ppt/slides")
@@ -258,7 +258,7 @@ def encoding(message, password, path_file_extracted, output_stego_directory_path
                             offset_run_element += 1
                             if len(text[N:]) == 0:  # anche se <a:t> è vuoto, il decoder lo ignora dall'estrazione
                                 new_run_element.find("./" + TEXT_ELEMENT_TAG).text = ""
-                            # optimization -> remove tree.write("stego/document.xml")
+
                             N = 1
                             count_txt_tag += 1
                         i += 1
