@@ -4,8 +4,7 @@ import zipfile
 import sys
 from lxml import etree
 import copy
-from webapp.backend import utils
-from webapp.backend import impercettibilityEX
+from backend import utils, impercettibilityEX
 
 #Constant for XML SpreadSheetML element
 PREFIX_EXCEL_PROC = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"

@@ -1,7 +1,7 @@
 import os
 from lxml import etree
 import copy
-from webapp.backend import utils
+from backend import utils
 
 # External XML file to load (necessario path completo perche' os.cwd = "/webapp")
 PRESET_TABLE_STYLE_XML_FILE_PATH = "./backend/external_xml/presetTableStyles.xml"

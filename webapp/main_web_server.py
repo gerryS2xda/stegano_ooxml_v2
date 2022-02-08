@@ -1,19 +1,16 @@
-import socketserver
 import cgi
 import json
 import os
 from http.server import SimpleHTTPRequestHandler, HTTPServer
-from urllib.parse import urlparse
-from urllib.parse import parse_qs
-from webapp.backend import split_method_stegano
+from backend import split_method_stegano
 
 # Server configuration
 hostName = "localhost"
 serverPort = 8080
 
 # Other configuration
-INPUT_FILES_DIR = "./backend/input_files"
-WORKING_DIRECTORY_PATH = "./backend/working_directory"
+INPUT_FILES_DIR = "backend/input_files"
+WORKING_DIRECTORY_PATH = "backend/working_directory"
 OUTPUT_STEGO_DIRECTORY = "./backend/output_stego"
 
 # Classe che riceverà e risponderà alla richieste HTTP
@@ -30,7 +27,7 @@ class MyHttpRequestHandlerServer(SimpleHTTPRequestHandler):
 
         # Ridireziona verso la pagina iniziale
         if self.path == "/":
-            self.path = "/frontend/index.html"
+            self.path = "frontend/index.html"
 
 
         return SimpleHTTPRequestHandler.do_GET(self)

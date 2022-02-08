@@ -1,5 +1,5 @@
 from lxml import etree
-from webapp.backend import utils
+from backend import utils
 import os
 
 #Constant for XML PresentationML element

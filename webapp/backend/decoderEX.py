@@ -1,5 +1,5 @@
 from lxml import etree
-from webapp.backend import utils
+from backend import utils
 
 #Constant for XML SpreadSheetML element
 PREFIX_EXCEL_PROC = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"

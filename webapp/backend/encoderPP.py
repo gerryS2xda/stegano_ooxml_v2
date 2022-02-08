@@ -5,7 +5,7 @@ import sys
 from lxml import etree
 import copy 
 import random
-from webapp.backend import utils
+from backend import utils
 
 #Constant for XML PresentationML element
 PREFIX_POWERPOINT_PROC = "{http://schemas.openxmlformats.org/presentationml/2006/main}"

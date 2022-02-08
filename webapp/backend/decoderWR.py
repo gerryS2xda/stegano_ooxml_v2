@@ -1,5 +1,5 @@
 from lxml import etree
-from webapp.backend import utils
+from backend import utils
 
 #Constant for XML WordProcessing element
 PREFIX_WORD_PROC = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"

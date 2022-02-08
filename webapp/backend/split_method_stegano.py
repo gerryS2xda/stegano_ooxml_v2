@@ -1,13 +1,6 @@
 import os
-import sys
 import time
-from webapp.backend import encoderWR
-from webapp.backend import encoderPP
-from webapp.backend import encoderEX
-from webapp.backend import decoderWR
-from webapp.backend import decoderPP
-from webapp.backend import decoderEX
-from webapp.backend import utils
+from backend import decoderPP, encoderWR, decoderEX, encoderEX, utils, encoderPP, decoderWR
 
 # Other configuration (necessario path completo perche' os.cwd = "webapp")
 INPUT_FILES_DIR = "./backend/input_files"
