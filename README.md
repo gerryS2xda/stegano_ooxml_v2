@@ -2,7 +2,7 @@
 Progetto di tesi magistrale per il corso di Digital Forensics a cura di Paolo Vigorito (prima versione) e Gerardo Michele Laucella (seconda versione). 
 
 <p align="center" width="100%">
-  <img align="left" src="./webapp/frontend/image/HideAText.png" height="100" />
+  <img src="./webapp/frontend/image/HideAText.png" height="140" />
 </p>
 
 ## Info sul progetto
