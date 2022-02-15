@@ -6,10 +6,10 @@ Progetto di tesi magistrale per il corso di Digital Forensics (tenuto dal prof. 
 </p>
 
 ## Info sul progetto
-Questo progetto realizza in Python (versione 3.7) la tecnica steganografica del metodo dello split del contenuto testuale per i documenti Microsoft Office Word, PowerPoint ed Excel. Tale tecnica è stata studiata per i documenti Word consultando il paper [1] . L'idea è stata quella di verificare se è possibile riadattare la tecnica applicata per i documenti Word anche per le altre tipologie di file in formato OOXML come file ".pptx" e ".xlsx" sfruttando qualche elemento in comune nel gestire il contenuto testuale.
+Questo progetto realizza in Python (versione 3.7) la <b>tecnica steganografica del metodo dello split del contenuto testuale</b> per i documenti Microsoft Office Word, PowerPoint ed Excel. Tale tecnica è stata studiata per i documenti Word consultando il paper [1]. L'idea è stata quella di verificare se è possibile <b>riadattare la tecnica</b> applicata per i documenti Word anche per le altre tipologie di file in formato OOXML come file ".pptx" e ".xlsx" sfruttando qualche elemento in comune nel <b>gestire il contenuto testuale</b>.
 
 ## Il metodo dello split
-È una tecnica steganografica per nascondere informazioni all'interno di un documento in formato OOXML sfruttando le caratteristiche di gestione del contenuto testuale, da mostrare sull'applicativo, in tali documenti. L'idea è quella di splittare gli elementi o tag XML che si occupano del contenuto testuale in base ai bit dell'informazione da nascondere. Ad esempio, se il bit da nascondere è "1" si applica lo split, altrimenti non si applica lo split ma si tiene traccia nel testo del punto in cui andare a fare la prossima suddivisione quando il prossimo bit da incapsulare è "1".
+È una tecnica steganografica per nascondere informazioni all'interno di un documento in formato OOXML sfruttando le caratteristiche di gestione del contenuto testuale, da mostrare sull'applicativo, in tali documenti. L'idea è quella di <b>splittare gli elementi o tag XML</b> che si occupano del contenuto testuale in base ai bit dell'informazione da nascondere. Ad esempio, se il bit da nascondere è "1" si applica lo split, altrimenti non si applica lo split ma si tiene traccia nel testo del punto in cui andare a fare la prossima suddivisione quando il prossimo bit da incapsulare è "1".
 
 ## Funzionalità
   - Uso di un modulo di cifratura simmetrico (AES-CBC) per cifrare o decifrare testo da nascondere
@@ -17,6 +17,11 @@ Questo progetto realizza in Python (versione 3.7) la tecnica steganografica del 
   - Estrazione di un testo da un ".docx", ".pptx", ".xlsx"
   - Web Application dedicata e una versione da riga di comando
   - Risolto problema dell'impercettibilità in Excel
+
+## Librerie Python utilizzate
+  - <b>lxml</b>, per manipolare i file XML
+  - <b>fernet</b>, per il modulo di cifratura e decifratura
+  - Librerie per la <b>gestione delle directory e file</b> quali: "os", "shutil", "zipfile"  
 
 ## Command Line App version
 1) Inserire i file di input nella directory "app/input"
