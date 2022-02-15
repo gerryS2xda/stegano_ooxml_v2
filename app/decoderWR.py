@@ -65,10 +65,9 @@ def decoding(password, path_file_extracted):
     count_text_secret = 0
     for p in split_duplicate:
         try:
-            #if utils.decrypt(password, p) != None:
-            #    count_text_secret += 1
             print(utils.decrypt(password, p))
+            count_text_secret += 1
         except:
-            print("una duplicazione del testo segreto non può essere decifrata poichè incompleta --> " + p)
+            print("Una duplicazione del testo segreto non può essere decifrata poichè incompleta --> " + p)
             continue
-    print("Numero di volte del messaggio secreto: " + count_text_secret.__str__())
+    print("Numero di ripetizioni del testo segreto incapsulato: " + count_text_secret.__str__())
