@@ -6,7 +6,7 @@ Progetto di tesi magistrale per il corso di Digital Forensics (tenuto dal prof. 
 </p>
 
 ## Info sul progetto
-Questo progetto realizza la tecnica steganografica del metodo dello split del contenuto testuale per i documenti Microsoft Office Word, PowerPoint ed Excel. Tale tecnica è stata studiata per i documenti Word consultando il paper [1] . L'idea è stata quella di verificare se è possibile riadattare la tecnica applicata per i documenti Word anche per le altre tipologie di file in formato OOXML come file ".pptx" e ".xlsx" sfruttando qualche elemento in comune nel gestire il contenuto testuale.
+Questo progetto realizza in Python (versione 3.7) la tecnica steganografica del metodo dello split del contenuto testuale per i documenti Microsoft Office Word, PowerPoint ed Excel. Tale tecnica è stata studiata per i documenti Word consultando il paper [1] . L'idea è stata quella di verificare se è possibile riadattare la tecnica applicata per i documenti Word anche per le altre tipologie di file in formato OOXML come file ".pptx" e ".xlsx" sfruttando qualche elemento in comune nel gestire il contenuto testuale.
 
 ## Il metodo dello split
 È una tecnica steganografica per nascondere informazioni all'interno di un documento in formato OOXML sfruttando le caratteristiche di gestione del contenuto testuale, da mostrare sull'applicativo, in tali documenti. L'idea è quella di splittare gli elementi o tag XML che si occupano del contenuto testuale in base ai bit dell'informazione da nascondere. Ad esempio, se il bit da nascondere è "1" si applica lo split, altrimenti non si applica lo split ma si tiene traccia nel testo del punto in cui andare a fare la prossima suddivisione quando il prossimo bit da incapsulare è "1".
