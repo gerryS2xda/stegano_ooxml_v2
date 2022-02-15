@@ -9,7 +9,20 @@ from app import decoderPP
 from app import decoderEX
 from app import utils
 
+# Configuration
+INPUT_FILES_DIR = "./input"
+WORKING_DIRECTORY_PATH = "./working_directory"
+OUTPUT_STEGO_DIRECTORY = "./stego"
+
 if __name__ == '__main__':
+    # Crea le directory di lavoro se non sono presenti
+    if not os.path.exists(INPUT_FILES_DIR):
+        os.mkdir(INPUT_FILES_DIR)
+    if not os.path.exists(WORKING_DIRECTORY_PATH):
+        os.mkdir(WORKING_DIRECTORY_PATH)
+    if not os.path.exists(OUTPUT_STEGO_DIRECTORY):
+        os.mkdir(OUTPUT_STEGO_DIRECTORY)
+
     # Select mode to operate
     print("Seleziona la modalità di esecuzione digitando: \"1\" - Encoder; \"2\" - Decoder;")
     mode = input("Digita: ")
@@ -17,10 +30,10 @@ if __name__ == '__main__':
         # Encoder mode
         print("* * * * Encoder mode * * * *")
         # Read input file to apply Steganographic method (es. sample_file.docx, sample_file.pptx, sample_file.xlsx)
-        input_file_name = input("Inserisci il nome del file (es. fname.docx) da steganografare (deve essere nella directory \"input\"): ")
+        input_file_name = input("Inserisci il nome del file (es. fname.docx) da steganografare (deve essere nella directory \""+ INPUT_FILES_DIR + "\"): ")
 
         # Check existence of input file
-        path_input_file = "./test/" + input_file_name
+        path_input_file = INPUT_FILES_DIR + "/" + input_file_name
         if not os.path.exists(path_input_file):
             sys.exit("Il nome del file inserito non è presente nella directory \"input\"")
 
@@ -29,8 +42,7 @@ if __name__ == '__main__':
         utils.check_correct_extension_inputfile(input_file_extension)
 
         # Extract file in working folder
-        path_working_directory = "./test/working_directory"
-        utils.extract_ooxml_input_file_in_working_directory(path_working_directory, path_input_file, input_file_name)
+        utils.extract_ooxml_input_file_in_working_directory(WORKING_DIRECTORY_PATH, path_input_file, input_file_name)
 
         # Message to hide
         message = input("Inserisci testo segreto: ")
@@ -42,7 +54,7 @@ if __name__ == '__main__':
         start_time = time.time()
 
         # Select type of encoding by type of input file (i.e. fname.docx -> use encoder for docx)
-        path_file_extracted = path_working_directory + "/" + input_file_name + "/file_extracted"
+        path_file_extracted = WORKING_DIRECTORY_PATH + "/" + input_file_name + "/file_extracted"
         if input_file_extension == ".docx":
             print("Esecuzione text split method per un documento Word...")
             encoderWR.encoding(message, password, path_file_extracted)
@@ -58,7 +70,7 @@ if __name__ == '__main__':
         print("Tempo di esecuzione dell'encoder: " + execution_time.__str__() + " secondi")
 
         # Remove input file folder with extracted file from "working_directory"
-        utils.remove_directory(path_working_directory + "/" + input_file_name)
+        utils.remove_directory(WORKING_DIRECTORY_PATH + "/" + input_file_name)
     elif mode == "2":
         # Decoder mode
         print("* * * * Decoder mode * * * *")
@@ -66,17 +78,16 @@ if __name__ == '__main__':
         input_file_name = input("Inserisci il nome del file steganografato (es. fname_stego.docx) presente nella directory \"stego\": ")
 
         # Check existence of input file
-        path_input_file = "./stego/" + input_file_name
+        path_input_file =  OUTPUT_STEGO_DIRECTORY + "/" + input_file_name
         if not os.path.exists(path_input_file):
-            sys.exit("Il nome del file inserito non è presente nella directory \"stego\"")
+            sys.exit("Il nome del file inserito non è presente nella directory \"" + OUTPUT_STEGO_DIRECTORY +"\"")
 
         # Check correct extension of input file
         input_file_extension = os.path.splitext(path_input_file)[1]
         utils.check_correct_extension_inputfile(input_file_extension)
 
         # Extract file in working folder
-        path_working_directory = "./test/working_directory"
-        utils.extract_ooxml_input_file_in_working_directory(path_working_directory, path_input_file, input_file_name)
+        utils.extract_ooxml_input_file_in_working_directory(WORKING_DIRECTORY_PATH, path_input_file, input_file_name)
 
         # Insert passphrase to generate symmectric key for decrypt
         password = input("Inserisci password per decifrare il testo segreto: ")
@@ -85,7 +96,7 @@ if __name__ == '__main__':
         start_time = time.time()
 
         # Select type of encoding by type of input file (i.e. fname.docx -> use encoder for docx)
-        path_file_extracted = path_working_directory + "/" + input_file_name + "/file_extracted"
+        path_file_extracted = WORKING_DIRECTORY_PATH + "/" + input_file_name + "/file_extracted"
         if input_file_extension == ".docx":
             print("Esecuzione text split method per estrazione di un testo segreto da un documento Word...")
             decoderWR.decoding(password, path_file_extracted)
@@ -101,7 +112,7 @@ if __name__ == '__main__':
         print("Tempo di esecuzione del decoder: " + execution_time.__str__() + " secondi")
 
         # Remove input file folder with extracted file from "working_directory"
-        utils.remove_directory(path_working_directory + "/" + input_file_name)
+        utils.remove_directory(WORKING_DIRECTORY_PATH + "/" + input_file_name)
     else:
         sys.exit("Input digitato non è valido!! Fine!")
     exit(0)
