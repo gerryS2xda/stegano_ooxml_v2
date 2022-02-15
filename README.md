@@ -1,5 +1,5 @@
 # Stegano OOXML (v2) - Il metodo dello split del contenuto testuale
-Progetto di tesi magistrale per il corso di Digital Forensics a cura di Paolo Vigorito (prima versione) e Gerardo Michele Laucella (seconda versione). 
+Progetto di tesi magistrale per il corso di Digital Forensics (tenuto dal prof. Raffaele Pizzolante) a cura di Paolo Vigorito (prima versione) e Gerardo Michele Laucella (seconda versione). 
 
 <p align="center" width="100%">
   <img src="./webapp/frontend/image/HideAText.png" height="140" />
