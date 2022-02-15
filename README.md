@@ -42,8 +42,8 @@ Questo progetto realizza la tecnica steganografica del metodo dello split del co
   - Incapsulare il codice di un malware e verificare se esso viene rilevato da un antivirus
 
 ## Bibliografia
-  [1] W. Guo, L. Yang, Y. Yang, L. Li, Z. Liu e Y. Lu, «Information Hiding in OOXML Format Data based on the Splitting of Text Elements,» IEEE International Conference on Intelligence and Security Informatics (ISI), pp. 188-190, 2019. 
-  [2] P. Virgorito, Tecniche di steganografia: nascondere informazioni mediante l'uso dei documenti Word [Tesi di Laurea], Università degli Studi di Salerno - Dipartimento di Informatica, 2020. 
-  [3] Z. Fu, X. Sun, Y. Liu e B. Li, «Text split-based steganography in OOXML format documents for covert communication,» Security & Communication Networks, vol. 5, n. 9, pp. 957-968, 2012.
-  [4] OfficeOpenXML.com, «What is OOXML?,» [Online]. Available: http://officeopenxml.com/index.php.
+  [1] W. Guo, L. Yang, Y. Yang, L. Li, Z. Liu e Y. Lu, «Information Hiding in OOXML Format Data based on the Splitting of Text Elements,» IEEE International Conference on Intelligence and Security Informatics (ISI), pp. 188-190, 2019. <br>
+  [2] P. Virgorito, Tecniche di steganografia: nascondere informazioni mediante l'uso dei documenti Word [Tesi di Laurea], Università degli Studi di Salerno - Dipartimento di Informatica, 2020. <br>
+  [3] Z. Fu, X. Sun, Y. Liu e B. Li, «Text split-based steganography in OOXML format documents for covert communication,» Security & Communication Networks, vol. 5, n. 9, pp. 957-968, 2012. <br>
+  [4] OfficeOpenXML.com, «What is OOXML?,» [Online]. Available: http://officeopenxml.com/index.php. <br>
   [5] ECMA International, «Standard ECMA-376 Office Open XML File Formats – Part 1,» ECMA International Publication, June 2011. 
