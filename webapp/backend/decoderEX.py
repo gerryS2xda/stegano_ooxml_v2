@@ -74,5 +74,5 @@ def decoding(password, path_file_extracted):
         except:
             print("una duplicazione del testo segreto non può essere decifrata poichè incompleta --> " + p)
             continue
-    print("Numero di volte del messaggio secreto: " + count_repeat_text_secret.__str__())
+    print("Numero di ripetizioni del testo segreto incapsulato: " + count_repeat_text_secret.__str__())
     return message_extract, count_repeat_text_secret
