@@ -64,13 +64,13 @@ def decoding(password, path_file_extracted):
     #step 8 -> Estrai il testo segreto H da M.
     string_enc = "".join(chr(int("".join(map(str, message[i:i+8])), 2)) for i in range(0, len(message), 8))
     split_duplicate = string_enc.split(utils.MAGIC_CHAR_SPLIT)
-    print("TESTO DECIFRATO: ")
-    count_text_secret = 0
+    message_extract = ""
+    count_repeat_text_secret = 0
     for p in split_duplicate:
         try:
-            print(utils.decrypt(password, p))
-            count_text_secret += 1
+            message_extract += (utils.decrypt(password, p)).decode("utf-8") + "\n"
+            count_repeat_text_secret += 1
         except:
             print("Una duplicazione del testo segreto non può essere decifrata poichè incompleta --> " + p)
             continue
-    print("Numero di ripetizioni del testo segreto incapsulato: " + count_text_secret.__str__())
+    return message_extract, count_repeat_text_secret
